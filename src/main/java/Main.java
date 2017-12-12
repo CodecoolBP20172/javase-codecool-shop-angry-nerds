@@ -30,7 +30,7 @@ public class Main {
         get("/index", (Request req, Response res) -> {
            return new ThymeleafTemplateEngine().render( ProductController.renderProducts(req, res) );
         });
-        get("list/:supOrCat/:id", (Request req, Response res) -> {
+        get("listby/:supOrCat/:id", (Request req, Response res) -> {
             return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req.params(":supOrCat"), req.params(":id")) );
         });
 

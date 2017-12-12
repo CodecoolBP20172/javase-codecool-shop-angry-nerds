@@ -25,24 +25,27 @@ public class ProductController {
     public static ModelAndView renderProducts(Request req, Response res) {
 
         Map params = new HashMap<>();
-        params.put("category", productCategoryDataStore.find(1));
+        params.put("title", "All products");
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
-        params.put("products", productDataStore.getBy(productCategoryDataStore.find(1)));
+        params.put("products", productDataStore.getAll());
         return new ModelAndView(params, "product/index");
     }
 
     public static ModelAndView renderProductsBy(String supOrCat, String id) {
         Map params = new HashMap<>();
-        params.put("category", productCategoryDataStore.find(1));
+        params.put("categories", productCategoryDataStore.getAll());
+        params.put("suppliers", supplierDataStore.getAll());
         System.out.println(supOrCat + id);
         if (supOrCat.equals("supplier")){
-            params.put("products", productDataStore.getBy(supplierDataStore.find(Integer.parseInt(id))));
+            Supplier supplier = supplierDataStore.find(Integer.parseInt(id));
+            params.put("title", supOrCat + " : " +  supplier.getName());
+            params.put("products", productDataStore.getBy(supplier));
         } else if ( supOrCat.equals("category")) {
-            System.out.println(111);
-            params.put("products", productDataStore.getBy(productCategoryDataStore.find(Integer.parseInt(id))));
+            ProductCategory productCategory = productCategoryDataStore.find(Integer.parseInt(id));
+            params.put("title", supOrCat + " : " +  productCategory.getName());
+            params.put("products", productDataStore.getBy(productCategory));
         } else {
-            System.out.println(122);
             return new ModelAndView(params, "404");
         }
         return new ModelAndView(params, "product/index");

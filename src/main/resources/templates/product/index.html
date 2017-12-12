@@ -30,12 +30,12 @@
 <body>
 
 <div class="jumbotron text-center">
-    <h1 th:text="${supplier}">Codecool Shop</h1>
+    <h1>Codecool Shop</h1>
 </div>
 
 <div class="container">
     <div class="well well-sm">
-        <strong th:text="${category.name}">Category Title</strong>
+        <strong th:text="${title}">Category Title</strong>
     </div>
 
     <div class="dropdown">
@@ -44,7 +44,7 @@
         <span class="caret"></span>
     </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
-            <li  th:each="category : ${categories}"><a th:href="'/category/' + ${category.id}" th:text="${category.name}">Action</a></li>
+            <li  th:each="category : ${categories}"><a th:href="'/listby/category/' + ${category.id}" th:text="${category.name}">Action</a></li>
         </ul>
     </div><br></br>
 
@@ -54,7 +54,7 @@
             <span class="caret"></span>
         </button>
         <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
-            <li  th:each="supplier : ${suppliers}"><a th:href="'/supplier/' + ${supplier.id}" th:text="${supplier.name}">Action</a></li>
+            <li  th:each="supplier : ${suppliers}"><a th:href="'/listby/supplier/' + ${supplier.id}" th:text="${supplier.name}">Action</a></li>
         </ul>
     </div><br></br>
 
