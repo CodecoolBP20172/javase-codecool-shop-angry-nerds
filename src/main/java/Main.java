@@ -16,7 +16,7 @@ public class Main {
         // default server settings
         exception(Exception.class, (e, req, res) -> e.printStackTrace());
         staticFileLocation("/public");
-        port(8888);
+        port(8000);
 
         // populate some data for the memory storage
         populateData();
@@ -32,6 +32,9 @@ public class Main {
         });
         get("listby/:supOrCat/:id", (Request req, Response res) -> {
             return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req.params(":supOrCat"), req.params(":id")) );
+        });
+        get("cart/:id", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render( ProductController.addProduct(req.params(":id")) );
         });
 
         // Add this line to your project to enable the debug screen
