@@ -18,14 +18,32 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class ProductController {
+    private static ProductDao productDataStore = ProductDaoMem.getInstance();
+    private static ProductCategoryDao productCategoryDataStore = ProductCategoryDaoMem.getInstance();
+    private static SupplierDao supplierDataStore = SupplierDaoMem.getInstance();
 
     public static ModelAndView renderProducts(Request req, Response res) {
-        ProductDao productDataStore = ProductDaoMem.getInstance();
-        ProductCategoryDao productCategoryDataStore = ProductCategoryDaoMem.getInstance();
 
         Map params = new HashMap<>();
+
         params.put("category", productCategoryDataStore.find(1));
         params.put("products", productDataStore.getBy(productCategoryDataStore.find(1)));
+        return new ModelAndView(params, "product/index");
+    }
+
+    public static ModelAndView renderProductsBy(String supOrCat, String id) {
+        Map params = new HashMap<>();
+        params.put("category", productCategoryDataStore.find(1));
+        System.out.println(supOrCat + id);
+        if (supOrCat.equals("supplier")){
+            params.put("products", productDataStore.getBy(supplierDataStore.find(Integer.parseInt(id))));
+        } else if ( supOrCat.equals("category")) {
+            System.out.println(111);
+            params.put("products", productDataStore.getBy(productCategoryDataStore.find(Integer.parseInt(id))));
+        } else {
+            System.out.println(122);
+            return new ModelAndView(params, "404");
+        }
         return new ModelAndView(params, "product/index");
     }
 
