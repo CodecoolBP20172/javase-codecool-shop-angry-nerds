@@ -35,8 +35,28 @@
 
 <div class="container">
     <div class="well well-sm">
-        <strong th:text="${category.name}">Category Title</strong>
+        <strong th:text="${title}">Category Title</strong>
     </div>
+
+    <div class="dropdown">
+    <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+        Products by Category
+        <span class="caret"></span>
+    </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <li  th:each="category : ${categories}"><a th:href="'/listby/category/' + ${category.id}" th:text="${category.name}">Action</a></li>
+        </ul>
+    </div><br></br>
+
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Products by Supplier
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            <li  th:each="supplier : ${suppliers}"><a th:href="'/listby/supplier/' + ${supplier.id}" th:text="${supplier.name}">Action</a></li>
+        </ul>
+    </div><br></br>
 
     <div id="products" class="row list-group">
 
