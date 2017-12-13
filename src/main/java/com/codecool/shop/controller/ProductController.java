@@ -76,7 +76,7 @@ public class ProductController {
         int sumPrice = 0;
         String firstCurrency = null;
         String nextCurrency = null;
-        boolean differCurrency = false;
+        boolean isError = false;
         Map params = new HashMap<>();
         params.put("title", "Your cart");
         params.put("cartProducts", cartData.getAll());
@@ -89,15 +89,14 @@ public class ProductController {
             } else {
                 nextCurrency = entry.getKey().getDefaultCurrency().toString();
                 if (!firstCurrency.equals(nextCurrency)) {
-                    differCurrency = true;
+                    isError = true;
+                    params.put("errorMessage", "Oh no! You cant order items with different currencies.");
                 }
             }
-        }
-        if (differCurrency){
-            sumPrice = 0;
-            firstCurrency = ", You cant order items with different currencies!";
+
 
         }
+        params.put("isError", isError);
         params.put("sumPrice", sumPrice);
         params.put("currency", firstCurrency);
         return new ModelAndView(params, "product/cart");
