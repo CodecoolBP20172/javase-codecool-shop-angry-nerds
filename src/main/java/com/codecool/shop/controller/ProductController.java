@@ -83,7 +83,7 @@ public class ProductController {
         params.put("cartSize", cartData.getCount());
         int firstLoop = 0;
         for (Map.Entry<Product, Integer> entry : cartData.getAll().entrySet()) {
-            sumPrice += entry.getKey().getDefaultPrice();
+            sumPrice += entry.getKey().getDefaultPrice()*entry.getValue();
             if (firstLoop++ == 0) {
                 firstCurrency = entry.getKey().getDefaultCurrency().toString();
             } else {

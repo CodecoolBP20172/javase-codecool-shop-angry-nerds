@@ -65,7 +65,7 @@
         </div>
         </tbody>
     </table>
-    <h2 th:text="'Total: ' + ${sumPrice} + ' ' + ${currency}"></h2>
+    <h2 th:text="'Total: ' + ${#numbers.formatDecimal(sumPrice,0, 'DEFAULT', 2, 'DEFAULT')} + ' ' + ${currency}"></h2>
 </div>
 <div th:replace="footer :: copy"></div>
 
