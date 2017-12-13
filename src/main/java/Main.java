@@ -36,6 +36,9 @@ public class Main {
         get("cart/:id", (Request req, Response res) -> {
             return new ThymeleafTemplateEngine().render( ProductController.addProduct(req.params(":id")) );
         });
+        get("/showcart/", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
+        });
 
         // Add this line to your project to enable the debug screen
         enableDebugScreen();

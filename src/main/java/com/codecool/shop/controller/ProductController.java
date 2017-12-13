@@ -53,6 +53,7 @@ public class ProductController {
         } else {
             return new ModelAndView(params, "404");
         }
+        System.out.println(params);
         return new ModelAndView(params, "product/index");
     }
 
@@ -65,9 +66,18 @@ public class ProductController {
         Product product = productDataStore.find(Integer.parseInt(id));
         cartData.add(product);
         params.put("cartSize", cartData.getCount());
-        System.out.println(cartData.toString());
-        System.out.println(cartData.getCount());
+
         return new ModelAndView(params, "product/index");
+    }
+
+    public static ModelAndView renderCart() {
+        Map params = new HashMap<>();
+        params.put("title", "Your cart");
+        params.put("cartProducts", cartData.getAll());
+        params.put("cartSize", cartData.getCount());
+        System.out.println(params);
+        return new ModelAndView(params, "product/cart");
+
     }
 
 }

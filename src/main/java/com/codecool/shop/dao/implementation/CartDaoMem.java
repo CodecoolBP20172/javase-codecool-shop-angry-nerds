@@ -3,9 +3,8 @@ package com.codecool.shop.dao.implementation;
 
 import com.codecool.shop.dao.CartDao;
 import com.codecool.shop.model.Product;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.atomic.AtomicLong;
@@ -38,9 +37,14 @@ public class CartDaoMem implements CartDao {
     }
 
     @Override
-    public Map<Product, AtomicLong> getAll() {
-        return DATA;
+    public Map<Product, Integer> getAll() {
+        Map<Product, Integer> formedData = new HashMap<>();
+        for (Map.Entry<Product, AtomicLong> entry : DATA.entrySet()) {
+            formedData.put(entry.getKey(), entry.getValue().intValue());
+        }
+        return formedData;
     }
+
 
     @Override
     public String toString() {

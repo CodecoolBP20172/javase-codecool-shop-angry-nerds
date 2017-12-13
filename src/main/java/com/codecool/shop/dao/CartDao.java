@@ -11,7 +11,7 @@ public interface CartDao {
 
     void add(Product product);
 
-    Map<Product, AtomicLong> getAll();
+    Map<Product, Integer> getAll();
 
     int getCount();
 }
