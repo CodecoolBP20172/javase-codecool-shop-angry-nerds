@@ -14,5 +14,6 @@ public interface CartDao {
     Map<Product, Integer> getAll();
 
     int getCount();
+    void remove(int id);
 }
 

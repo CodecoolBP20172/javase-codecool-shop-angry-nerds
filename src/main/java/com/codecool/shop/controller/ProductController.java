@@ -103,4 +103,8 @@ public class ProductController {
 
     }
 
+    public static void removeProduct(Integer id) {
+        cartData.remove(id);
+    }
+
 }

@@ -58,6 +58,14 @@ public class CartDaoMem implements CartDao {
         }
         return print.toString();
     }
+    @Override
+    public void remove(int id) {
+        for (Map.Entry<Product, AtomicLong> entry : DATA.entrySet()) {
+            if (entry.getKey().getId() == id) {
+                DATA.remove(entry.getKey());
+            }
+        }
+    }
 
     public int getCount() {
         int count = 0;

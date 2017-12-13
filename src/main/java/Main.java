@@ -39,6 +39,11 @@ public class Main {
         get("/showcart/", (Request req, Response res) -> {
             return new ThymeleafTemplateEngine().render( ProductController.renderCart());
         });
+        get("/remove/:id", (Request req, Response res) -> {
+            ProductController.removeProduct(Integer.parseInt(req.params(":id")));
+            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
+        });
+
 
         // Add this line to your project to enable the debug screen
         enableDebugScreen();
