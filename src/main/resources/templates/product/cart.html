@@ -53,9 +53,9 @@
         </tr>
         </thead>
         <tbody>
-        <div th:each="cartProduct, value: ${cartProducts}">
+        <div th:each="cartProduct, iter: ${cartProducts}">
             <tr>
-                <td th:text="1"></td>
+                <td th:text="${iter.index}+1"></td>
                 <td th:text="${cartProduct.key.name}"></td>
                 <td th:text="${cartProduct.value}"></td>
                 <td th:text="${cartProduct.key.defaultPrice} + ' / ' +
