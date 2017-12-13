@@ -51,4 +51,17 @@ public class ProductController {
         return new ModelAndView(params, "product/index");
     }
 
+    public static ModelAndView forms(String title) {
+        Map params = new HashMap<>();
+        params.put("title", title);
+        return new ModelAndView(params, "forms");
+    }
+
+    public static ModelAndView forms(String title, String method) {
+        Map params = new HashMap<>();
+        params.put("title", title);
+        params.put("method", method);
+        return new ModelAndView(params, "forms");
+    }
+
 }

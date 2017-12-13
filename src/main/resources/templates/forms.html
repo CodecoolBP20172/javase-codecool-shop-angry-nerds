@@ -1,0 +1,92 @@
+<!doctype html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8" />
+    <meta name="author" content="Codecool" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Codecool Shop</title>
+
+    <!-- Latest compiled and minified Jquery -->
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous" />
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+
+    <link rel="stylesheet" type="text/css" href="/css/custom.css" />
+</head>
+
+<body>
+
+<div class="jumbotron text-center">
+    <h1>Codecool Shop</h1>
+</div>
+
+<div class="container">
+    <div class="well well-sm">
+        <strong th:text="${title}">Category Title</strong>
+    </div>
+
+    <div class="well well-sm" th:switch="${title}">
+        <div th:case="'Checkout'">
+        <form method="POST" action="/saveData">
+            <h3>Name:  </h3><input type="text" name="name" value=""/><br/>
+            <h3>Email: </h3><input type="text" name="email" value=""/><br/>
+            <h3>Phone Number: </h3><input type="number" name="phone" value=""/><br/>
+            <h3>Billing Address: </h3>
+                <h4>Country: </h4><input type="text" name="billCountry" value=""/><br/>
+                <h4>City: </h4><input type="text" name="billCity" value=""/><br/>
+                <h4>Zipcode: </h4><input type="number" name="billZipcode" value=""/><br/>
+                <h4>Address: </h4><input type="text" name="billAddress" value=""/><br/>
+            <h3>Shipping Address: </h3>
+                <h4>Country: </h4><input type="text" name="shipCountry" value=""/><br/>
+                <h4>City: </h4><input type="text" name="shipCity" value=""/><br/>
+                <h4>Zipcode: </h4><input type="text" name="shipZipcode" value=""/><br/>
+                <h4>Address: </h4><input type="text" name="shipAddress" value=""/><br/>
+            <input class="btn btn-success" type="submit" value="Payment"/>
+        </form>
+        </div>
+
+        <div th:case="'Select Payment'">
+            <a class="btn btn-success" href="/pay/creditcard">Creditcard</a>
+            <a class="btn btn-success" href="/pay/paypal">PayPal</a>
+        </div>
+
+        <div th:case="'Payment'">
+            <div th:switch="${method}">
+                <div th:case="'creditcard'">
+                    <form method="POST" action="/pay">
+                        <h3>Card number:  </h3><input type="text" name="name" value=""/><br/>
+                        <h3>Card holder: </h3><input type="text" name="email" value=""/><br/>
+                        <h3>Expiry date: </h3><input type="number" name="expirydate" value=""/><br/>
+                        <h3>Code: </h3><input type="number" name="code" value=""/><br/>
+                        <input class="btn btn-success" type="submit" value="Pay"/>
+                    </form>
+                </div>
+                <div th:case="'paypal'">
+                    <form method="POST" action="/pay">
+                        <h3>Username:  </h3><input type="text" name="username" value=""/><br/>
+                        <h3>Password: </h3><input type="text" name="password" value=""/><br/>
+                        <input class="btn btn-success" type="submit" value="Pay"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div th:replace="footer :: copy"></div>
+
+</body>
+</html>

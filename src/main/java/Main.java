@@ -34,6 +34,21 @@ public class Main {
             return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req.params(":supOrCat"), req.params(":id")) );
         });
 
+        get("/checkout", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Checkout"));
+        });
+
+        post("/saveData", (Request req, Response res) -> {
+            //savedata
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Select Payment"));
+        });
+
+        get("/pay/:payMethod", (Request req, Response res) -> {
+            //savedata
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Payment", req.params(":payMethod")));
+        });
+
+
         // Add this line to your project to enable the debug screen
         enableDebugScreen();
     }
