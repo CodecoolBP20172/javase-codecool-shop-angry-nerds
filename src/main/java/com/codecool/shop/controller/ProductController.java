@@ -16,8 +16,10 @@ import spark.Request;
 import spark.Response;
 import spark.ModelAndView;
 
+import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class ProductController {
     private static ProductDao productDataStore = ProductDaoMem.getInstance();
@@ -71,11 +73,33 @@ public class ProductController {
     }
 
     public static ModelAndView renderCart() {
+        int sumPrice = 0;
+        String firstCurrency = null;
+        String nextCurrency = null;
+        boolean differCurrency = false;
         Map params = new HashMap<>();
         params.put("title", "Your cart");
         params.put("cartProducts", cartData.getAll());
         params.put("cartSize", cartData.getCount());
-        System.out.println(params);
+        int firstLoop = 0;
+        for (Map.Entry<Product, Integer> entry : cartData.getAll().entrySet()) {
+            sumPrice += entry.getKey().getDefaultPrice();
+            if (firstLoop++ == 0) {
+                firstCurrency = entry.getKey().getDefaultCurrency().toString();
+            } else {
+                nextCurrency = entry.getKey().getDefaultCurrency().toString();
+                if (!firstCurrency.equals(nextCurrency)) {
+                    differCurrency = true;
+                }
+            }
+        }
+        if (differCurrency){
+            sumPrice = 0;
+            firstCurrency = ", You cant order items with different currencies!";
+
+        }
+        params.put("sumPrice", sumPrice);
+        params.put("currency", firstCurrency);
         return new ModelAndView(params, "product/cart");
 
     }
