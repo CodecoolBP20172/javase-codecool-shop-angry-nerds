@@ -50,6 +50,7 @@
             <th>Name</th>
             <th>Quantity</th>
             <th>Unit price / Subtotal</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -61,6 +62,11 @@
                 <td th:text="${cartProduct.key.defaultPrice} + ' / ' +
                 ${#numbers.formatDecimal((cartProduct.key.defaultPrice)*(cartProduct.value),0, 'DEFAULT', 2, 'DEFAULT')}
                 + ' ' + ${cartProduct.key.defaultCurrency} "></td>
+                <td>
+                    <a th:attr="href='/remove/' + ${cartProduct.key.id}">
+                        <span class="glyphicon glyphicon-remove"></span>
+                    </a>
+                </td>
             </tr>
         </div>
         </tbody>
@@ -69,7 +75,7 @@
     <div th:unless="${isError}">
     <h2 th:text="'Total: ' + ${#numbers.formatDecimal(sumPrice,0, 'DEFAULT', 2, 'DEFAULT')} + ' ' + ${currency}"></h2>
        <form action="/checkout" method="GET">
-        <button type="submit">Proceed to checkout</button>
+        <button type="submit" class="btn btn-success">Proceed to checkout</button>
        </form>
     </div>
 </div>
