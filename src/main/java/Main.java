@@ -16,7 +16,7 @@ public class Main {
         // default server settings
         exception(Exception.class, (e, req, res) -> e.printStackTrace());
         staticFileLocation("/public");
-        port(8888);
+        port(8000);
 
         // populate some data for the memory storage
         populateData();
@@ -33,6 +33,26 @@ public class Main {
         get("listby/:supOrCat/:id", (Request req, Response res) -> {
             return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req.params(":supOrCat"), req.params(":id")) );
         });
+        get("cart/:id", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render( ProductController.addProduct(req.params(":id")) );
+        });
+        get("/showcart/", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
+        });
+
+        get("/checkout", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Checkout"));
+        });
+
+        post("/saveData", (Request req, Response res) -> {
+            //saveData(req);
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Select Payment"));
+        });
+
+        get("/pay/:payMethod", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Payment", req.params(":payMethod")));
+        });
+
 
         // Add this line to your project to enable the debug screen
         enableDebugScreen();
