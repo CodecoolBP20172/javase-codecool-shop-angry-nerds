@@ -42,7 +42,7 @@
 <div class="jumbotron text-center">
     <h1 th:text="${title}"></h1>
 </div>
-<div>
+<div th:if="${cartSize} != 0">
     <table class="table table-inverse">
         <thead>
         <tr>
@@ -66,7 +66,15 @@
         </tbody>
     </table>
     <h2 th:if="${isError}" th:text="${errorMessage}"></h2>
-    <h2 th:unless="${isError}" th:text="'Total: ' + ${#numbers.formatDecimal(sumPrice,0, 'DEFAULT', 2, 'DEFAULT')} + ' ' + ${currency}"></h2>
+    <div th:unless="${isError}">
+    <h2 th:text="'Total: ' + ${#numbers.formatDecimal(sumPrice,0, 'DEFAULT', 2, 'DEFAULT')} + ' ' + ${currency}"></h2>
+       <form action="/checkout" method="GET">
+        <button type="submit">Proceed to checkout</button>
+       </form>
+    </div>
+</div>
+<div th:unless="${cartSize} != 0">
+    <h2>Empty cart</h2>
 </div>
 <div th:replace="footer :: copy"></div>
 
