@@ -10,7 +10,10 @@ import com.codecool.shop.model.Supplier;
 import spark.Request;
 import spark.Response;
 import spark.ModelAndView;
-
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -115,13 +118,25 @@ public class ProductController {
 
         List<String> list = new ArrayList<>(Arrays.asList("Name", "E-mail", "Phone Number", "Billing Address", "Billing City", "Billing Zipcode", "Billing Country","Shipping Address", "Shipping City", "Shipping Zipcode",  "Shipping Country"));
         LinkedHashMap userData = new LinkedHashMap();
+        JSONObject json = new JSONObject();
 
         for (String data : list){
             userData.put(data, req.queryParams(data));
+            json.put(data, req.queryParams(data));
         }
         Order order = new Order(cartData.getAll(), userData);
         orderData.add(order);
+        json.put("Ordered Items", cartData.getAll());
+        json.put("Order ID", orderData.getLast().getId());
 
+        try (FileWriter file = new FileWriter("src/main/resources/json/order" + orderData.getLast().getId() + ".json")) {
+
+            file.write(json.toJSONString());
+            file.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static ModelAndView confirmation() {
