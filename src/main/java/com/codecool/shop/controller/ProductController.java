@@ -2,15 +2,15 @@ package com.codecool.shop.controller;
 
 import com.codecool.shop.dao.*;
 import com.codecool.shop.dao.implementation.*;
-import com.codecool.shop.model.Order;
-import com.codecool.shop.model.Product;
-import com.codecool.shop.model.ProductCategory;
-import com.codecool.shop.model.Supplier;
+import com.codecool.shop.model.*;
 
 import spark.Request;
 import spark.Response;
 import spark.ModelAndView;
-
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -115,20 +115,32 @@ public class ProductController {
 
         List<String> list = new ArrayList<>(Arrays.asList("Name", "E-mail", "Phone Number", "Billing Address", "Billing City", "Billing Zipcode", "Billing Country","Shipping Address", "Shipping City", "Shipping Zipcode",  "Shipping Country"));
         LinkedHashMap userData = new LinkedHashMap();
+        JSONObject json = new JSONObject();
 
         for (String data : list){
             userData.put(data, req.queryParams(data));
+            json.put(data, req.queryParams(data));
         }
         Order order = new Order(cartData.getAll(), userData);
         orderData.add(order);
+        json.put("Ordered Items", cartData.getAll());
+        json.put("Order ID", orderData.getLast().getId());
 
+        try (FileWriter file = new FileWriter("target/json/order" + orderData.getLast().getId() + ".json")) {
+
+            file.write(json.toJSONString());
+            file.flush();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static ModelAndView confirmation() {
         int sumPrice = 0;
         Map params = new HashMap();
         for (Map.Entry<Product, Integer> entry : cartData.getAll().entrySet()) {
-            sumPrice += entry.getKey().getDefaultPrice();
+            sumPrice += entry.getKey().getDefaultPrice() * entry.getValue();
         }
         cartData.clearCart();
         params.put("message", "Payment successful!");
@@ -136,6 +148,7 @@ public class ProductController {
         params.put("orderData", orderData.getLast().getOrder());
         params.put("orderId", orderData.getLast().getId());
         params.put("sumPrice", sumPrice);
+        Email.sendEmail(orderData.getLast());
         return new ModelAndView(params, "confirmation");
     }
 
