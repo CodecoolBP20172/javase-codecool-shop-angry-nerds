@@ -126,7 +126,7 @@ public class ProductController {
         json.put("Ordered Items", cartData.getAll());
         json.put("Order ID", orderData.getLast().getId());
 
-        try (FileWriter file = new FileWriter("src/main/resources/json/order" + orderData.getLast().getId() + ".json")) {
+        try (FileWriter file = new FileWriter("target/json/order" + orderData.getLast().getId() + ".json")) {
 
             file.write(json.toJSONString());
             file.flush();
