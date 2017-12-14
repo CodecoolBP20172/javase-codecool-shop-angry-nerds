@@ -2,10 +2,7 @@ package com.codecool.shop.controller;
 
 import com.codecool.shop.dao.*;
 import com.codecool.shop.dao.implementation.*;
-import com.codecool.shop.model.Order;
-import com.codecool.shop.model.Product;
-import com.codecool.shop.model.ProductCategory;
-import com.codecool.shop.model.Supplier;
+import com.codecool.shop.model.*;
 
 import spark.Request;
 import spark.Response;
@@ -143,7 +140,7 @@ public class ProductController {
         int sumPrice = 0;
         Map params = new HashMap();
         for (Map.Entry<Product, Integer> entry : cartData.getAll().entrySet()) {
-            sumPrice += entry.getKey().getDefaultPrice();
+            sumPrice += entry.getKey().getDefaultPrice() * entry.getValue();
         }
         cartData.clearCart();
         params.put("message", "Payment successful!");
@@ -151,6 +148,7 @@ public class ProductController {
         params.put("orderData", orderData.getLast().getOrder());
         params.put("orderId", orderData.getLast().getId());
         params.put("sumPrice", sumPrice);
+        Email.sendEmail(orderData.getLast());
         return new ModelAndView(params, "confirmation");
     }
 
