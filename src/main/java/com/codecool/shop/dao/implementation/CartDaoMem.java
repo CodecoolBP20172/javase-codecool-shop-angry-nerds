@@ -74,4 +74,12 @@ public class CartDaoMem implements CartDao {
         }
         return count;
     }
+    @Override
+    public void setQuantity(int id, int quantity) {
+        for (Map.Entry<Product, AtomicLong> entry : DATA.entrySet()) {
+            if (entry.getKey().getId() == id) {
+                DATA.put(entry.getKey(), new AtomicLong(quantity));
+            }
+        }
+    }
 }

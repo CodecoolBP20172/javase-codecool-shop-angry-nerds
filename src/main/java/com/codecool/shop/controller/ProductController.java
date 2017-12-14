@@ -107,4 +107,13 @@ public class ProductController {
         cartData.remove(id);
     }
 
+    public static void changeQuantity(Integer id, Integer quantity){
+        if (quantity == 0) {
+            cartData.remove(id);
+        } else {
+            cartData.setQuantity(id, quantity);
+        }
+
+    }
+
 }

@@ -58,7 +58,12 @@
             <tr>
                 <td th:text="${iter.index}+1"></td>
                 <td th:text="${cartProduct.key.name}"></td>
-                <td th:text="${cartProduct.value}"></td>
+                <td>
+                    <form th:attr="action='/changeQuantity/' + ${cartProduct.key.id}">
+                     <input type="number" name="quantity" min="0" max="99999" th:value="${cartProduct.value}"></input>
+                        <button type="submit" class="btn btn-success">Set</button>
+                    </form>
+                </td>
                 <td th:text="${cartProduct.key.defaultPrice} + ' / ' +
                 ${#numbers.formatDecimal((cartProduct.key.defaultPrice)*(cartProduct.value),0, 'DEFAULT', 2, 'DEFAULT')}
                 + ' ' + ${cartProduct.key.defaultCurrency} "></td>

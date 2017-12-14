@@ -15,5 +15,6 @@ public interface CartDao {
 
     int getCount();
     void remove(int id);
+    void setQuantity(int id, int quantity);
 }
 
