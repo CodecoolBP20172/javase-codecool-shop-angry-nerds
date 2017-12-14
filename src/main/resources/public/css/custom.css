@@ -60,3 +60,20 @@
 {
     margin: 0 0 11px;
 }
+
+.table-inverse
+{
+    width:100%;
+}
+
+.footer {
+    position: absolute;
+    left: 0;
+    bottom: 20px;
+    width: 100%;
+    border-style: solid;
+    border-width: 1px;
+    border-color: #dbdbdb;
+    padding: 10px;
+    border-radius: 3px;
+}

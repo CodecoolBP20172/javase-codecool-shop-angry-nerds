@@ -60,7 +60,7 @@
                 <td th:text="${cartProduct.key.name}"></td>
                 <td>
                     <form th:attr="action='/changeQuantity/' + ${cartProduct.key.id}">
-                     <input type="number" name="quantity" min="0" max="99999" th:value="${cartProduct.value}"></input>
+                        <input type="number" name="quantity" min="0" max="99999" th:value="${cartProduct.value}"></input>
                         <button type="submit" class="btn btn-success">Set</button>
                     </form>
                 </td>
@@ -78,16 +78,17 @@
     </table>
     <h2 th:if="${isError}" th:text="${errorMessage}"></h2>
     <div th:unless="${isError}">
-    <h2 th:text="'Total: ' + ${#numbers.formatDecimal(sumPrice,0, 'DEFAULT', 2, 'DEFAULT')} + ' ' + ${currency}"></h2>
-       <form action="/checkout" method="GET">
-        <button type="submit" class="btn btn-success">Proceed to checkout</button>
-       </form>
+        <h2 th:text="'Total: ' + ${#numbers.formatDecimal(sumPrice,0, 'DEFAULT', 2, 'DEFAULT')} + ' ' + ${currency}"></h2>
+        <form action="/checkout" method="GET">
+            <button type="submit" class="btn btn-success">Proceed to checkout</button>
+        </form>
     </div>
 </div>
 <div th:unless="${cartSize} != 0">
     <h2>Empty cart</h2>
 </div>
-<div th:replace="footer :: copy"></div>
-
+<div class="footer">
+    <p>© 2016 Codecool Budapest </p>
+</div>
 </body>
 </html>

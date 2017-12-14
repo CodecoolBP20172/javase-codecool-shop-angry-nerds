@@ -50,6 +50,19 @@ public class Main {
 
 
 
+        get("/checkout", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Checkout"));
+        });
+
+        post("/payment", (Request req, Response res) -> {
+            ProductController.saveData(req);
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Payment", req.queryParams("payment")));
+        });
+
+        post("/confirm", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.confirmation());
+        });
+
         // Add this line to your project to enable the debug screen
         enableDebugScreen();
     }
