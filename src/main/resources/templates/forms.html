@@ -40,33 +40,32 @@
 
     <div class="well well-sm" th:switch="${title}">
         <div th:case="'Checkout'">
-        <form method="POST" action="/saveData">
-            <h3>Name:  </h3><input type="text" name="name" value=""/><br/>
-            <h3>Email: </h3><input type="text" name="email" value=""/><br/>
-            <h3>Phone Number: </h3><input type="number" name="phone" value=""/><br/>
+        <form method="POST" action="/payment">
+            <h3>Name:  </h3><input type="text" name="Name" value=""/><br/>
+            <h3>Email: </h3><input type="text" name="E-mail" value=""/><br/>
+            <h3>Phone Number: </h3><input type="number" name="Phone Number" value=""/><br/>
             <h3>Billing Address: </h3>
-                <h4>Country: </h4><input type="text" name="billCountry" value=""/><br/>
-                <h4>City: </h4><input type="text" name="billCity" value=""/><br/>
-                <h4>Zipcode: </h4><input type="number" name="billZipcode" value=""/><br/>
-                <h4>Address: </h4><input type="text" name="billAddress" value=""/><br/>
+                <h4>Address: </h4><input type="text" name="Billing Address" value=""/><br/>
+                <h4>City: </h4><input type="text" name="Billing City" value=""/><br/>
+                <h4>Zipcode: </h4><input type="number" name="Billing Zipcode" value=""/><br/>
+                <h4>Country: </h4><input type="text" name="Billing Country" value=""/><br/>
             <h3>Shipping Address: </h3>
-                <h4>Country: </h4><input type="text" name="shipCountry" value=""/><br/>
-                <h4>City: </h4><input type="text" name="shipCity" value=""/><br/>
-                <h4>Zipcode: </h4><input type="text" name="shipZipcode" value=""/><br/>
-                <h4>Address: </h4><input type="text" name="shipAddress" value=""/><br/>
+                <h4>Address: </h4><input type="text" name="Shipping Address" value=""/><br/>
+                <h4>City: </h4><input type="text" name="Shipping City" value=""/><br/>
+                <h4>Zipcode: </h4><input type="text" name="Shipping Zipcode" value=""/><br/>
+                <h4>Country: </h4><input type="text" name="Shipping Country" value=""/><br/>
+            <select name="payment">
+                <option value="paypal">Pay with PayPal</option>
+                <option value="creditcard">Pay with Credit card</option>
+            </select>
             <input class="btn btn-success" type="submit" value="Payment"/>
         </form>
-        </div>
-
-        <div th:case="'Select Payment'">
-            <a class="btn btn-success" href="/pay/creditcard">Creditcard</a>
-            <a class="btn btn-success" href="/pay/paypal">PayPal</a>
         </div>
 
         <div th:case="'Payment'">
             <div th:switch="${method}">
                 <div th:case="'creditcard'">
-                    <form method="POST" action="/pay">
+                    <form method="POST" action="/confirm">
                         <h3>Card number:  </h3><input type="text" name="name" value=""/><br/>
                         <h3>Card holder: </h3><input type="text" name="email" value=""/><br/>
                         <h3>Expiry date: </h3><input type="number" name="expirydate" value=""/><br/>
@@ -75,7 +74,7 @@
                     </form>
                 </div>
                 <div th:case="'paypal'">
-                    <form method="POST" action="/pay">
+                    <form method="POST" action="/confirm">
                         <h3>Username:  </h3><input type="text" name="username" value=""/><br/>
                         <h3>Password: </h3><input type="text" name="password" value=""/><br/>
                         <input class="btn btn-success" type="submit" value="Pay"/>
@@ -86,7 +85,16 @@
     </div>
 </div>
 
-<div th:replace="footer :: copy"></div>
+<div th:switch="${title}">
+    <div th:case="'Checkout'">
+        <div th:replace="footer :: copy"></div>
+    </div>
+    <div th:case="'Payment'">
+        <div class="footer">
+            <p>© 2016 Codecool Budapest </p>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

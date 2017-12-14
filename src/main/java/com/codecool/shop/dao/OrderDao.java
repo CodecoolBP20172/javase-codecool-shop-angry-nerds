@@ -13,5 +13,7 @@ public interface OrderDao {
 
     List<Order> getAll();
 
+    Order getLast();
+
 
 }

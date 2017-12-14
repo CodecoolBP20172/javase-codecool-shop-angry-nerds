@@ -66,4 +66,8 @@ public class CartDaoMem implements CartDao {
         }
         return count;
     }
+
+    public void clearCart() {
+        DATA.clear();
+    }
 }

@@ -26,9 +26,7 @@
 
     <link rel="stylesheet" type="text/css" href="/css/custom.css" />
 </head>
-
 <body>
-
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <ul class="nav navbar-nav navbar-right">
@@ -40,40 +38,54 @@
     </div>
 </nav>
 <div class="jumbotron text-center">
-    <h1 th:text="${title}"></h1>
+    <h1 th:text="${message}"></h1>
+</div>
+<br></br>
+<div class="container">
+    <div class="row">
+        <div class="col align-self-center">
+            <h3 th:text="'Your order number is: ' + ${orderId}"></h3><br></br>
+            <table class="table table-inverse justify-content-center">
+                <tbody  th:each="data : ${userData}">
+                <tr>
+                    <td th:text="${data.key}"></td>
+                    <td th:text="${data.value}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 <div class="container">
     <div class="row">
         <div class="col align-self-center">
-        <table class="table table-inverse">
-            <thead>
-            <tr>
-                <th>#</th>
-                <th>Name</th>
-                <th>Quantity</th>
-                <th>Unit price / Subtotal</th>
-            </tr>
-            </thead>
-            <tbody>
-            <div th:each="cartProduct, iter: ${cartProducts}">
+            <table class="table table-inverse">
+                <thead>
                 <tr>
-                    <td th:text="${iter.index}+1"></td>
-                    <td th:text="${cartProduct.key.name}"></td>
-                    <td th:text="${cartProduct.value}"></td>
-                    <td th:text="${cartProduct.key.defaultPrice} + ' / ' +
-                    ${#numbers.formatDecimal((cartProduct.key.defaultPrice)*(cartProduct.value),0, 'DEFAULT', 2, 'DEFAULT')}
-                    + ' ' + ${cartProduct.key.defaultCurrency} "></td>
+                    <th>#</th>
+                    <th>Name</th>
+                    <th>Quantity</th>
+                    <th>Unit price / Subtotal</th>
                 </tr>
-            </div>
-            </tbody>
-        </table>
-        <h2 th:text="'Total: ' + ${sumPrice} + ' ' + ${currency}"></h2><a class="btn btn-success" th:href="'/checkout'">Checkout</a>
+                </thead>
+                <tbody>
+                <div th:each="cartProduct, iter: ${orderData}">
+                    <tr>
+                        <td th:text="${iter.index}+1"></td>
+                        <td th:text="${cartProduct.key.name}"></td>
+                        <td th:text="${cartProduct.value}"></td>
+                        <td th:text="${cartProduct.key.defaultPrice} + ' / ' +
+                        ${#numbers.formatDecimal((cartProduct.key.defaultPrice)*(cartProduct.value),0, 'DEFAULT', 2, 'DEFAULT')}
+                        + ' ' + ${cartProduct.key.defaultCurrency} "></td>
+                    </tr>
+                </div>
+                </tbody>
+            </table>
+            <h2 th:text="'Total: ' + ${sumPrice} + ' ' + 'USD'"></h2><br></br>
+            <a class="btn btn-success" th:href="'/'">Back to Main Page</a><br></br><br></br>
         </div>
     </div>
 </div>
-
-<div class="footer">
-    <p>© 2016 Codecool Budapest </p>
-</div>
+<div th:replace="footer :: copy"></div>
 </body>
 </html>

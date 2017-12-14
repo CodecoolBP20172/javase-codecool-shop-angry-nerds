@@ -1,13 +1,8 @@
 package com.codecool.shop.controller;
 
-import com.codecool.shop.dao.CartDao;
-import com.codecool.shop.dao.ProductCategoryDao;
-import com.codecool.shop.dao.ProductDao;
-import com.codecool.shop.dao.SupplierDao;
-import com.codecool.shop.dao.implementation.CartDaoMem;
-import com.codecool.shop.dao.implementation.ProductCategoryDaoMem;
-import com.codecool.shop.dao.implementation.ProductDaoMem;
-import com.codecool.shop.dao.implementation.SupplierDaoMem;
+import com.codecool.shop.dao.*;
+import com.codecool.shop.dao.implementation.*;
+import com.codecool.shop.model.Order;
 import com.codecool.shop.model.Product;
 import com.codecool.shop.model.ProductCategory;
 import com.codecool.shop.model.Supplier;
@@ -16,9 +11,7 @@ import spark.Request;
 import spark.Response;
 import spark.ModelAndView;
 
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ProductController {
@@ -26,6 +19,7 @@ public class ProductController {
     private static ProductCategoryDao productCategoryDataStore = ProductCategoryDaoMem.getInstance();
     private static SupplierDao supplierDataStore = SupplierDaoMem.getInstance();
     private static CartDao cartData = CartDaoMem.getInstance();
+    private static OrderDao orderData = OrderDaoMem.getInstance();
 
     public static ModelAndView renderProducts(Request req, Response res) {
 
@@ -116,6 +110,34 @@ public class ProductController {
         params.put("currency", firstCurrency);
         return new ModelAndView(params, "product/cart");
 
+    }
+
+    public static void saveData(Request req){
+
+        List<String> list = new ArrayList<>(Arrays.asList("Name", "E-mail", "Phone Number", "Billing Address", "Billing City", "Billing Zipcode", "Billing Country","Shipping Address", "Shipping City", "Shipping Zipcode",  "Shipping Country"));
+        LinkedHashMap userData = new LinkedHashMap();
+
+        for (String data : list){
+            userData.put(data, req.queryParams(data));
+        }
+        Order order = new Order(cartData.getAll(), userData);
+        orderData.add(order);
+
+    }
+
+    public static ModelAndView confirmation() {
+        int sumPrice = 0;
+        Map params = new HashMap();
+        for (Map.Entry<Product, Integer> entry : cartData.getAll().entrySet()) {
+            sumPrice += entry.getKey().getDefaultPrice();
+        }
+        cartData.clearCart();
+        params.put("message", "Payment successful!");
+        params.put("userData", orderData.getLast().getUserData());
+        params.put("orderData", orderData.getLast().getOrder());
+        params.put("orderId", orderData.getLast().getId());
+        params.put("sumPrice", sumPrice);
+        return new ModelAndView(params, "confirmation");
     }
 
 }

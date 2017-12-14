@@ -32,6 +32,9 @@ import java.util.List;
             return DATA;
         }
 
-    }
+        @Override
+        public Order getLast() {
+            return DATA.get(DATA.size()-1);
+        }
 
 }
