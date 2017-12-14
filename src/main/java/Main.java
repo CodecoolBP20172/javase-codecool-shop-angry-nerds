@@ -43,9 +43,11 @@ public class Main {
             ProductController.removeProduct(Integer.parseInt(req.params(":id")));
             return new ThymeleafTemplateEngine().render( ProductController.renderCart());
         });
-        get("/changeQuantity/:id", (Request req, Response res) -> {
-            ProductController.changeQuantity(Integer.parseInt(req.params(":id")),Integer.parseInt(req.queryParams("quantity")));
-            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
+        post("/changeQuantity", (Request req, Response res) -> {
+            ProductController.changeQuantity(Integer.parseInt(req.queryParams("id")),Integer.parseInt(req.queryParams("quantity")));
+            /*ProductController.changeQuantity(req.queryParams("id"));*/
+            return new ThymeleafTemplateEngine().render(ProductController.renderCart());
+
         });
 
 

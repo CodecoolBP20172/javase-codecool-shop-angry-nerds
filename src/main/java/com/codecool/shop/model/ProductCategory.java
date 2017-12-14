@@ -5,7 +5,6 @@ import java.util.ArrayList;
 public class ProductCategory extends BaseModel {
     private String department;
     private ArrayList<Product> products;
-
     public ProductCategory(String name, String department, String description) {
         super(name);
         this.department = department;

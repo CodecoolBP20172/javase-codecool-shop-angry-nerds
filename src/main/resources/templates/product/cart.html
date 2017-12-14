@@ -23,12 +23,12 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
             integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
             crossorigin="anonymous"></script>
+    <script type="text/javascript" src="/js/main.js"></script>
 
     <link rel="stylesheet" type="text/css" href="/css/custom.css" />
 </head>
 
 <body>
-
 <nav class="navbar navbar-default">
     <div class="container-fluid">
         <ul class="nav navbar-nav navbar-right">
@@ -59,14 +59,15 @@
                 <td th:text="${iter.index}+1"></td>
                 <td th:text="${cartProduct.key.name}"></td>
                 <td>
-                    <form th:attr="action='/changeQuantity/' + ${cartProduct.key.id}">
-                     <input type="number" name="quantity" min="0" max="99999" th:value="${cartProduct.value}"></input>
-                        <button type="submit" class="btn btn-success">Set</button>
-                    </form>
+                     <input type="number" name="quantity" min="0" max="99999" th:attr="id='quantity-input-'+${cartProduct.key.id}" th:value="${cartProduct.value}"></input>
+                        <button type="submit" class="btn btn-success quantity-button" th:attr="id=${cartProduct.key.id}">Set</button>
                 </td>
-                <td th:text="${cartProduct.key.defaultPrice} + ' / ' +
-                ${#numbers.formatDecimal((cartProduct.key.defaultPrice)*(cartProduct.value),0, 'DEFAULT', 2, 'DEFAULT')}
-                + ' ' + ${cartProduct.key.defaultCurrency} "></td>
+                <td>
+                    <span th:attr="id='product-price-'+${cartProduct.key.id}" th:text="${cartProduct.key.defaultPrice}"></span>
+                    <span>/</span>
+                    <span th:attr="id='product-sumprice-'+${cartProduct.key.id}" th:text="${#numbers.formatDecimal((cartProduct.key.defaultPrice)*(cartProduct.value),0, 'DEFAULT', 2, 'DEFAULT')}"></span>
+                    <span th:text=" ${cartProduct.key.defaultCurrency}"></span>
+                </td>
                 <td>
                     <a th:attr="href='/remove/' + ${cartProduct.key.id}">
                         <span class="glyphicon glyphicon-remove"></span>
@@ -78,7 +79,11 @@
     </table>
     <h2 th:if="${isError}" th:text="${errorMessage}"></h2>
     <div th:unless="${isError}">
-    <h2 th:text="'Total: ' + ${#numbers.formatDecimal(sumPrice,0, 'DEFAULT', 2, 'DEFAULT')} + ' ' + ${currency}"></h2>
+    <h2>
+        <span>Total: </span>
+        <span id="totalsum" th:text="${#numbers.formatDecimal(sumPrice,0, 'DEFAULT', 2, 'DEFAULT')}"></span>
+        <span th:text="' ' + ${currency}"></span>
+    </h2>
        <form action="/checkout" method="GET">
         <button type="submit" class="btn btn-success">Proceed to checkout</button>
        </form>
