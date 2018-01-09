@@ -28,6 +28,9 @@ public class CartDaoMem implements CartDao {
 
     @Override
     public void add(Product product) {
+        if (product == null) {
+            throw new IllegalArgumentException();
+        }
         if(DATA.containsKey(product)) {
             DATA.get(product).incrementAndGet();
         }
