@@ -16,7 +16,7 @@ public class CartDaoMem implements CartDao {
 
     /* A private Constructor prevents any other class from instantiating.
      */
-    private CartDaoMem() {
+    CartDaoMem() {
     }
 
     public static CartDaoMem getInstance() {
@@ -66,7 +66,7 @@ public class CartDaoMem implements CartDao {
             }
         }
     }
-
+    @Override
     public int getCount() {
         int count = 0;
         for (AtomicLong itemCount : DATA.values()) {
@@ -74,7 +74,7 @@ public class CartDaoMem implements CartDao {
         }
         return count;
     }
-
+    @Override
     public void clearCart() {
         DATA.clear();
     }
