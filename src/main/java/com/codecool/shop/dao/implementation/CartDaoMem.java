@@ -66,8 +66,10 @@ public class CartDaoMem implements CartDao {
         for (Map.Entry<Product, AtomicLong> entry : DATA.entrySet()) {
             if (entry.getKey().getId() == id) {
                 DATA.remove(entry.getKey());
+                return;
             }
         }
+        throw new IllegalArgumentException();
     }
     @Override
     public int getCount() {
@@ -84,10 +86,19 @@ public class CartDaoMem implements CartDao {
 
     @Override
     public void setQuantity(int id, int quantity) {
+        if (quantity == 0){
+            remove(id);
+            return;
+        }
+        if (quantity < 0) {
+            throw new IllegalArgumentException();
+        }
         for (Map.Entry<Product, AtomicLong> entry : DATA.entrySet()) {
             if (entry.getKey().getId() == id) {
                 DATA.put(entry.getKey(), new AtomicLong(quantity));
+                return;
             }
         }
+        throw new IllegalArgumentException();
     }
 }
