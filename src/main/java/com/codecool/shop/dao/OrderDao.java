@@ -15,5 +15,4 @@ public interface OrderDao {
 
     Order getLast();
 
-
 }
