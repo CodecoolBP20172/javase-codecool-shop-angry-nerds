@@ -5,13 +5,14 @@ import com.codecool.shop.controller.ProductController;
 import com.codecool.shop.dao.*;
 import com.codecool.shop.dao.implementation.*;
 import com.codecool.shop.model.*;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 import spark.Request;
 import spark.Response;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IllegalArgumentException{
 
         // default server settings
         exception(Exception.class, (e, req, res) -> e.printStackTrace());
@@ -67,7 +68,7 @@ public class Main {
         enableDebugScreen();
     }
 
-    public static void populateData() {
+    public static void populateData() throws IllegalArgumentException {
 
         ProductDao productDataStore = ProductDaoMem.getInstance();
         ProductCategoryDao productCategoryDataStore = ProductCategoryDaoMem.getInstance();

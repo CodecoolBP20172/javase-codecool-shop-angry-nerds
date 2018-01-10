@@ -3,6 +3,7 @@ package com.codecool.shop.dao.implementation;
 
 import com.codecool.shop.dao.ProductCategoryDao;
 import com.codecool.shop.model.ProductCategory;
+import com.sun.javaws.exceptions.InvalidArgumentException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +26,8 @@ public class ProductCategoryDaoMem implements ProductCategoryDao {
     }
 
     @Override
-    public void add(ProductCategory category) {
+    public void add(ProductCategory category) throws IllegalArgumentException {
+        if (category == null) throw new IllegalArgumentException();
         category.setId(DATA.size() + 1);
         DATA.add(category);
     }
