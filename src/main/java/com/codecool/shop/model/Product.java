@@ -75,4 +75,28 @@ public class Product extends BaseModel {
                 this.productCategory.getName(),
                 this.supplier.getName());
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Product product = (Product) o;
+
+        if (Float.compare(product.getDefaultPrice(), getDefaultPrice()) != 0) return false;
+        if (getDefaultCurrency() != null ? !getDefaultCurrency().equals(product.getDefaultCurrency()) : product.getDefaultCurrency() != null)
+            return false;
+        if (getProductCategory() != null ? !getProductCategory().equals(product.getProductCategory()) : product.getProductCategory() != null)
+            return false;
+        return getSupplier() != null ? getSupplier().equals(product.getSupplier()) : product.getSupplier() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (getDefaultPrice() != +0.0f ? Float.floatToIntBits(getDefaultPrice()) : 0);
+        result = 31 * result + (getDefaultCurrency() != null ? getDefaultCurrency().hashCode() : 0);
+        result = 31 * result + (getProductCategory() != null ? getProductCategory().hashCode() : 0);
+        result = 31 * result + (getSupplier() != null ? getSupplier().hashCode() : 0);
+        return result;
+    }
 }
