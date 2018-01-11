@@ -12,7 +12,7 @@ import java.util.List;
 public class UserJDBC {
 
     public static User getUser(int id) {
-        String query = "SELECT * user_data WHERE id = ?";
+        String query = "SELECT * FROM user_data WHERE id = ?";
         List<TypeCaster> list = new ArrayList <>();
         list.add(new TypeCaster(String.valueOf(id), true));
         User user = null;
@@ -21,7 +21,7 @@ public class UserJDBC {
             while (rs.next()){
                 String name = rs.getString("name");
                 String email = rs.getString("email");
-                String phoneNumber = rs.getString("phone");
+                String phoneNumber = rs.getString("phone_number");
                 String billingAddress = rs.getString("billing_address");
                 String billingCity = rs.getString("billing_city");
                 String billingZipcode = rs.getString("billing_zipcode");

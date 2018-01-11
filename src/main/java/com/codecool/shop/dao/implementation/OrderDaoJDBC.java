@@ -26,7 +26,7 @@ public class OrderDaoJDBC implements OrderDao{
 
     @Override
     public void add(Order order) {
-        String query = "INSERT INTO orders VALUES(1, 1);";
+        String query = "INSERT INTO orders (user_data_id, cart_id) VALUES (1, 1);";
         try(ConnectionHandler handler = new ConnectionHandler()) {
             handler.execute(query);
         } catch (SQLException e){
@@ -37,14 +37,14 @@ public class OrderDaoJDBC implements OrderDao{
     @Override
     public List<Order> getAll() {
         List<Order> orders = new ArrayList <>();
-        String query = "SELECT * orders";
+        String query = "SELECT * FROM orders;";
         try (ConnectionHandler handler = new ConnectionHandler()) {
             ResultSet rs = handler.process(query);
             while (rs.next()) {
                 int id = rs.getInt("id");
                 int userDataId = rs.getInt("user_data_id");
                 int cartId = rs.getInt("cart_id");
-                orders.add(new Order(CartDaoJDBC.getInstance.getAll(), UserJDBC.getUser(userDataId).getUserData())); //CartDao needs a get
+                orders.add(new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId).getUserData())); //CartDao needs a get
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -55,14 +55,15 @@ public class OrderDaoJDBC implements OrderDao{
     @Override
     public Order getLast() {
         Order lastOrder = null;
-        String query = "SELECT * orders ORDER BY id DESC limit 1";
+        String query = "SELECT * FROM orders ORDER BY id DESC limit 1;";
         try(ConnectionHandler handler = new ConnectionHandler()) {
             ResultSet rs = handler.process(query);
             rs.next();
             int id = rs.getInt("id");
             int userDataId = rs.getInt("user_data_id");
             int cartId = rs.getInt("cart_id");
-            lastOrder = new Order(CartDaoJDBC.getInstance.getAll(), UserJDBC.getUser(userDataId).getUserData());
+            lastOrder = new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId).getUserData());
+            lastOrder.setId(id);
         } catch (SQLException e){
             e.printStackTrace();
         }
