@@ -75,6 +75,12 @@ public class CartDaoJDBC implements CartDao {
 
     @Override
     public void clearCart() {
+        try {
+            ConnectionHandler conn = new ConnectionHandler();
+            conn.execute("DELETE FROM Cart");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 
