@@ -106,6 +106,7 @@ class ProductDaoJDBCTest extends ProductDaoTest<ProductDaoJDBC> {
     @Override
     public void setUpInstance(){
         instance = createInstance();
+        TestDataJDBC.executeSqlScript(new java.io.File("tests/reset_data.sql"));
     }
 
 }

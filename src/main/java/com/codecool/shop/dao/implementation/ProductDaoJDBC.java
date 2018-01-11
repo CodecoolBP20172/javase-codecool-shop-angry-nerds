@@ -36,7 +36,7 @@ public class ProductDaoJDBC implements ProductDao {
             list.add(new TypeCaster(product.getDescription(), false));
             list.add(new TypeCaster(Integer.toString(product.getSupplier().getId()), true));
             list.add(new TypeCaster(Integer.toString(product.getProductCategory().getId()), true));
-            con.process("INSERT INTO product VALUES (?, ?, ?,  ?, ?, ?);", list);
+            con.process("INSERT INTO product VALUES (DEFAULT, ?, ?, ?,  ?, ?, ?);", list);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -48,7 +48,7 @@ public class ProductDaoJDBC implements ProductDao {
         try (ConnectionHandler con = new ConnectionHandler()){
             List<TypeCaster> list = new ArrayList<>();
             list.add(new TypeCaster(Integer.toString(id), true));
-            ResultSet rs = con.process("SELECT FROM product WHERE id = ?", list);
+            ResultSet rs = con.process("SELECT * FROM product WHERE id = ?", list);
             List<Product> productList = getProductsFromResultSet(rs);
             product = productList.get(0);
         } catch (SQLException e) {
@@ -96,12 +96,12 @@ public class ProductDaoJDBC implements ProductDao {
         List<Product> productList = new ArrayList<>();
         while (rs.next()){
             String name = rs.getString("name");
-            int default_price = rs.getInt("default_price");
+            float default_price = rs.getFloat("default_price");
             String default_currency = rs.getString("default_currency");
             String description = rs.getString("description");
             int  product_category_id = rs.getInt("product_category_id");
             int supplier_id = rs.getInt("supplier_id");
-            //productList.add(name, default_price, default_currency, description, ProductCategoryDaoJDBC.find(product_category_id), SupplierDaoJDBC.find(supplier_id));
+            productList.add(new Product(name, default_price, default_currency, description, ProductCategoryDaoJDBC.getInstance().find(product_category_id), SupplierDaoJDBC.getInstance().find(supplier_id)));
         }
         return productList;
     }
@@ -110,9 +110,13 @@ public class ProductDaoJDBC implements ProductDao {
         List<Product> productList = null;
         try (ConnectionHandler con = new ConnectionHandler()){
             List<TypeCaster> list = new ArrayList<>();
-            list.add(new TypeCaster(supOrPC, false));
             list.add(new TypeCaster(Integer.toString(model.getId()), true));
-            ResultSet rs = con.process("SELECT * FROM product WHERE ? = ?", list);
+            ResultSet rs = null;
+            if (supOrPC == "supplier_id"){
+                rs = con.process("SELECT * FROM product WHERE supplier_id = ?", list);
+            } else {
+                rs = con.process("SELECT * FROM product WHERE product_category_id = ?", list);
+            }
             productList = getProductsFromResultSet(rs);
         } catch (SQLException e) {
             e.printStackTrace();
