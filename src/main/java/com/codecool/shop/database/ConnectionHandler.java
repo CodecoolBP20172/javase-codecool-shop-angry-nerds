@@ -17,10 +17,34 @@ public class ConnectionHandler implements AutoCloseable {
         }
     }
 
+    public void execute(String query, List<TypeCaster> listOfFieldLabels) throws SQLException {
+        before();
+        PreparedStatement pstm = con.prepareStatement(query);
+        pstm = preparedStatementCreator(pstm, listOfFieldLabels);
+        pstm.execute();
+    }
+
+    public void execute(String query) throws SQLException {
+        before();
+        PreparedStatement pstm = con.prepareStatement(query);
+        pstm.execute();
+    }
+
     public ResultSet process(String query, List<TypeCaster> listOfFieldLabels) throws SQLException {
         before();
         PreparedStatement pstm = con.prepareStatement(query);
-        for (int i = 0; i < listOfFieldLabels.size(); i++){
+        pstm = preparedStatementCreator(pstm, listOfFieldLabels);
+        return pstm.executeQuery();
+    }
+
+    public ResultSet process(String query) throws SQLException {
+        before();
+        PreparedStatement pstm = con.prepareStatement(query);
+        return pstm.executeQuery();
+    }
+
+    private PreparedStatement preparedStatementCreator(PreparedStatement pstm, List<TypeCaster> listOfFieldLabels) throws SQLException {
+        for (int i = 0; i < listOfFieldLabels.size(); i++) {
             String content = listOfFieldLabels.get(i).getContent();
             if (listOfFieldLabels.get(i).isNumber()) {
                 pstm.setInt(i, Integer.parseInt(content));
@@ -28,9 +52,10 @@ public class ConnectionHandler implements AutoCloseable {
                 pstm.setString(i, content);
             }
         }
-        return pstm.executeQuery();
+        return pstm;
     }
 
+    @Override
     public void close() {
         try {
             con.close();
