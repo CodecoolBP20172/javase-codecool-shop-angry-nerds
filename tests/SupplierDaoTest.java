@@ -4,6 +4,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public abstract class SupplierDaoTest <T extends SupplierDao> {
@@ -14,7 +16,9 @@ public abstract class SupplierDaoTest <T extends SupplierDao> {
 
     @BeforeEach
     void initialize() {
+        TestDataMem.clearInstances();
         TestDataMem.fillInstances();
+        TestDataJDBC.executeSqlScript(new File("tests/reset_data.sql"));
     }
 
     @Test
@@ -40,7 +44,6 @@ public abstract class SupplierDaoTest <T extends SupplierDao> {
 
     @Test
     void getAll() {
-        System.out.println(instance.getAll());
         assertTrue(instance.getAll().size() == 3);
     }
 }
