@@ -31,6 +31,13 @@ public class ConnectionHandler implements AutoCloseable {
         return pstm.executeQuery();
     }
 
+    public ResultSet process(String query) throws SQLException {
+        before();
+        PreparedStatement pstm = con.prepareStatement(query);
+        return pstm.executeQuery();
+    }
+
+    @Override
     public void close() {
         try {
             con.close();
