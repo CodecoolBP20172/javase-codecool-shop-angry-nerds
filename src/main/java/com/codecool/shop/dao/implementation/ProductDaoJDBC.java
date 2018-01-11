@@ -34,8 +34,9 @@ public class ProductDaoJDBC implements ProductDao {
             list.add(new TypeCaster(Float.toString(product.getDefaultPrice()), true));
             list.add(new TypeCaster(product.getDefaultCurrency().toString(), false));
             list.add(new TypeCaster(product.getDescription(), false));
-            list.add(new TypeCaster(Integer.toString(product.getSupplier().getId()), true));
             list.add(new TypeCaster(Integer.toString(product.getProductCategory().getId()), true));
+            list.add(new TypeCaster(Integer.toString(product.getSupplier().getId()), true));
+
             con.process("INSERT INTO product VALUES (DEFAULT, ?, ?, ?,  ?, ?, ?);", list);
         } catch (SQLException e) {
             e.printStackTrace();
