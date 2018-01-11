@@ -1,7 +1,9 @@
 
 
 import com.codecool.shop.dao.CartDao;
+import com.codecool.shop.dao.implementation.CartDaoJDBC;
 import com.codecool.shop.dao.implementation.CartDaoMem;
+import com.codecool.shop.dao.implementation.ProductDaoJDBC;
 import com.codecool.shop.model.Product;
 import com.codecool.shop.model.ProductCategory;
 import com.codecool.shop.model.Supplier;
@@ -35,12 +37,8 @@ public abstract class CartDaoTest<T extends CartDao> {
     @Test
     public void addTest() {
         List<Product> products = new ArrayList<>(instance.getAll().keySet());
-        for (int i = 0; i < 100; i++) {
+        for (int i = 0; i < 10; i++) {
             Product product = products.get(random.nextInt(products.size()));
-            if (i == 0) {
-                product = new Product("test", 1, "USD", "test descr",
-                        new ProductCategory("testCat", "testDep", "testing"), new Supplier("testSupp", "supp"));
-            }
             int oldValue = instance.getAll().get(product) == null ? 0 : instance.getAll().get(product);
             instance.add(product);
             assertEquals((int) instance.getAll().get(product), oldValue + 1);
@@ -55,8 +53,9 @@ public abstract class CartDaoTest<T extends CartDao> {
     @Test
     public void getAllWithAdd() {
         Map<Product, Integer> expectedMap = new HashMap<>(instance.getAll());
-        List<Product> products = new ArrayList<>(instance.getAll().keySet());
-        for (int i = 0; i < 100; i++) {
+        List<Product> products = ProductDaoJDBC.getInstance().getAll();
+
+        for (int i = 0; i < 20; i++) {
             Product product = products.get(random.nextInt(products.size()));
             instance.add(product);
             if (expectedMap.containsKey(product)) {
@@ -91,7 +90,7 @@ public abstract class CartDaoTest<T extends CartDao> {
         Map<Product, Integer> IterateExpectedMap = new HashMap<>(instance.getAll());
 
         for (Product product: IterateExpectedMap.keySet()){
-            if (product.getId() == 3) {
+            if (product.getName().equals("Amazon Fire HD 8")) {
                 expectedMap.remove(product);
             }
         }
@@ -101,17 +100,17 @@ public abstract class CartDaoTest<T extends CartDao> {
     }
 
     @Test
-    public void removeThree() {
+    public void removeAll() {
         Map<Product, Integer> expectedMap = new HashMap<>(instance.getAll());
         Map<Product, Integer> IterateExpectedMap = new HashMap<>(instance.getAll());
 
         for (Product product: IterateExpectedMap.keySet()){
-            if (product.getId() == 3 || product.getId() == 0 || product.getId() == 1 ) {
+            if (product.getName().equals("Amazon Fire HD 8") || product.getName().equals("Lenovo IdeaPad Miix 700") || product.getName().equals("Amazon Fire" )) {
                 expectedMap.remove(product);
             }
         }
         instance.remove(3);
-        instance.remove(0);
+        instance.remove(2);
         instance.remove(1);
         assertEquals(expectedMap, instance.getAll());
     }
@@ -132,7 +131,7 @@ public abstract class CartDaoTest<T extends CartDao> {
         Map<Product, Integer> IterateExpectedMap = new HashMap<>(instance.getAll());
 
         for (Product product: IterateExpectedMap.keySet()){
-            if (product.getId() == 3) {
+            if (product.getName().equals("Amazon Fire HD 8")) {
                 expectedMap.remove(product);
             }
         }
@@ -144,11 +143,11 @@ public abstract class CartDaoTest<T extends CartDao> {
     public void setQuantity() {
         Map<Product, Integer> expectedMap = new HashMap<>(instance.getAll());
         for (Product product: expectedMap.keySet()){
-            if (product.getId() == 2) {
+            if (product.getName().equals("Amazon Fire HD 8")) {
                 expectedMap.put(product,6);
             }
         }
-        instance.setQuantity(2,6);
+        instance.setQuantity(3,6);
         assertEquals(expectedMap,instance.getAll());
     }
 
@@ -168,4 +167,18 @@ class cartDaoMemTests extends CartDaoTest<CartDaoMem> {
 
     }
 
+}
+
+class cartDaoJdbcTests extends CartDaoTest<CartDaoJDBC> {
+
+    @Override
+    protected CartDaoJDBC createInstance() {
+        return CartDaoJDBC.getInstance();
+    }
+
+    @Override
+    protected void setUpInstance() {
+        instance = createInstance();
+        TestDataJDBC.executeSqlScript(new java.io.File("tests/reset_data.sql"));
+    }
 }
