@@ -1,6 +1,7 @@
 
 
 import com.codecool.shop.dao.CartDao;
+import com.codecool.shop.dao.implementation.CartDaoJdbc;
 import com.codecool.shop.dao.implementation.CartDaoMem;
 import com.codecool.shop.model.Product;
 import com.codecool.shop.model.ProductCategory;
@@ -168,4 +169,17 @@ class cartDaoMemTests extends CartDaoTest<CartDaoMem> {
 
     }
 
+}
+
+class cartDaoJdbcTests extends CartDaoTest<CartDaoJdbc> {
+
+    @Override
+    protected CartDaoJdbc createInstance() {
+        return CartDaoJdbc.getInstance();
+    }
+
+    @Override
+    protected void setUpInstance() {
+        instance = createInstance();
+    }
 }
