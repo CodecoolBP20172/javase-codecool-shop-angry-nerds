@@ -1,7 +1,6 @@
 package com.codecool.shop.dao;
 
 import com.codecool.shop.model.ProductCategory;
-import com.sun.javaws.exceptions.InvalidArgumentException;
 
 import java.util.List;
 

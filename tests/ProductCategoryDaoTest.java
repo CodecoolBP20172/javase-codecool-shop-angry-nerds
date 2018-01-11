@@ -1,5 +1,4 @@
-package com.codecool.shop.dao;
-
+import com.codecool.shop.dao.ProductCategoryDao;
 import com.codecool.shop.model.ProductCategory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,50 +12,42 @@ public abstract class ProductCategoryDaoTest<T extends ProductCategoryDao> {
 
     protected abstract T createInstance();
 
-    ProductCategory notebook = new ProductCategory("Notebook", "Hardware", "A portable computer.");
-    ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
-    ProductCategory audio = new ProductCategory("Audio", "Hardware", "bla bla");
-    ProductCategory electronics = new ProductCategory("Electronics", "Hardware", "bla bla");
+//    ProductCategory notebook = new ProductCategory("Notebook", "Hardware", "A portable computer.");
+//    ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
+//    ProductCategory audio = new ProductCategory("Audio", "Hardware", "bla bla");
+//    ProductCategory electronics = new ProductCategory("Electronics", "Hardware", "bla bla");
 
 
     @BeforeEach
     void initialize() {
-        instance.add(notebook);
-        instance.add(audio);
-        instance.add(electronics);
+        TestDataMem.clearInstances();
+        TestDataMem.fillInstances();
     }
 
     @Test
     void testAdd() throws IllegalArgumentException {
-        instance.add(tablet);
-        assertTrue(instance.getAll().contains(tablet));
+        instance.add(TestDataMem.tablet);
+        assertTrue(instance.getAll().contains(TestDataMem.tablet));
         assertThrows(IllegalArgumentException.class, () -> {
             instance.add(null);
         });
-        instance.remove(tablet.getId());
+        instance.remove(TestDataMem.tablet.getId());
     }
 
     @Test
     void find() {
-        assertEquals(notebook,instance.find(notebook.getId()));
-        assertEquals(audio,instance.find(audio.getId()));
+        assertEquals(TestDataMem.notebook,instance.find(TestDataMem.notebook.getId()));
+        assertEquals(TestDataMem.audio,instance.find(TestDataMem.audio.getId()));
     }
-
     @Test
     void remove() {
-        instance.remove(notebook.getId());
-        assertFalse(instance.getAll().contains(notebook));
+        if (instance.getAll().contains(TestDataMem.notebook)) instance.remove(TestDataMem.notebook.getId());
+        assertFalse(instance.getAll().contains(TestDataMem.notebook));
     }
 
     @Test
     void getAll() {
-        assertTrue(instance.getAll().size() == 3);
+        assertTrue(instance.getAll().size() == 4);
     }
 
-    @AfterEach
-    void finish() {
-        if(instance.getAll().contains(notebook)) instance.remove(notebook.getId());
-        instance.remove(audio.getId());
-        instance.remove(electronics.getId());
-    }
 }
