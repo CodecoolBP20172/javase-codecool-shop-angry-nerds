@@ -29,14 +29,44 @@
 
 <body>
 
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <a class="btn btn-success" href="/">Main Page</a>
+        <ul class="nav navbar-nav navbar-right">
+            <li><a href="/showcart/" th:text="${cartSize}"></a></li>
+            <li><a class="navbar-brand" href="/showcart/">
+                <img src="/img/cart.png" width="32" height="32"></img>
+            </a></li>
+        </ul>
+    </div>
+</nav>
 <div class="jumbotron text-center">
     <h1>Codecool Shop</h1>
 </div>
-
 <div class="container">
     <div class="well well-sm">
-        <strong th:text="${category.name}">Category Title</strong>
+        <strong th:text="${title}">Category Title</strong>
     </div>
+
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Products by Category
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+            <li  th:each="category : ${categories}"><a th:href="'/listby/category/' + ${category.id}" th:text="${category.name}">Action</a></li>
+        </ul>
+    </div><br></br>
+
+    <div class="dropdown">
+        <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+            Products by Supplier
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="dropdownMenu2">
+            <li  th:each="supplier : ${suppliers}"><a th:href="'/listby/supplier/' + ${supplier.id}" th:text="${supplier.name}">Action</a></li>
+        </ul>
+    </div><br></br>
 
     <div id="products" class="row list-group">
 
@@ -51,7 +81,7 @@
                             <p class="lead" th:text="${prod.getPrice()}">100 USD</p>
                         </div>
                         <div class="col-xs-12 col-md-6">
-                            <a class="btn btn-success" href="#">Add to cart</a>
+                            <a class="btn btn-success" th:href="'/cart/' + ${prod.id}">Add to cart</a>
                         </div>
                     </div>
                 </div>

@@ -3,7 +3,7 @@ package com.codecool.shop.model;
 
 import java.lang.reflect.Field;
 
-public class BaseModel {
+public abstract class BaseModel {
 
     protected int id;
     protected String name;
@@ -61,4 +61,23 @@ public class BaseModel {
         return sb.toString();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        BaseModel baseModel = (BaseModel) o;
+
+        if (getId() != baseModel.getId()) return false;
+        if (getName() != null ? !getName().equals(baseModel.getName()) : baseModel.getName() != null) return false;
+        return getDescription() != null ? getDescription().equals(baseModel.getDescription()) : baseModel.getDescription() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId();
+        result = 31 * result + (getName() != null ? getName().hashCode() : 0);
+        result = 31 * result + (getDescription() != null ? getDescription().hashCode() : 0);
+        return result;
+    }
 }
