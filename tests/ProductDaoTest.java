@@ -39,7 +39,7 @@ public abstract class ProductDaoTest<T extends ProductDao> {
         Supplier amazon = new Supplier("Amazon", "Digital content and services");
         amazon.setId(1);
         ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
-        tablet.setId(1);
+        tablet.setId(2);
         Product expected = new Product("Amazon Fire", 49.9f, "USD", "Fantastic price. Large content ecosystem. Good parental controls. Helpful technical support.", tablet, amazon);
         expected.setId(1);
         assertEquals(expected, instance.find(1));
@@ -72,7 +72,7 @@ public abstract class ProductDaoTest<T extends ProductDao> {
     @Test
     public void testGetByProductCategory() {
         ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
-        tablet.setId(1);
+        tablet.setId(2);
         assertEquals(instance.getBy(tablet).size(), 3);
     }
 

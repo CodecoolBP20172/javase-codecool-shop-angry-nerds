@@ -11,7 +11,7 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
 public class Main {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IllegalArgumentException{
 
         // default server settings
         exception(Exception.class, (e, req, res) -> e.printStackTrace());
@@ -67,7 +67,7 @@ public class Main {
         enableDebugScreen();
     }
 
-    public static void populateData() {
+    public static void populateData() throws IllegalArgumentException {
 
         ProductDao productDataStore = ProductDaoMem.getInstance();
         ProductCategoryDao productCategoryDataStore = ProductCategoryDaoMem.getInstance();
