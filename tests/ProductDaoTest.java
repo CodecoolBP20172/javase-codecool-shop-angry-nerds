@@ -27,7 +27,7 @@ public abstract class ProductDaoTest<T extends ProductDao> {
         Supplier amazon = new Supplier("Amazon", "Digital content and services");
         amazon.setId(1);
         ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
-        tablet.setId(1);
+        tablet.setId(2);
         Product expected = new Product("Amazon Fire", 49.9f, "USD", "Fantastic price. Large content ecosystem. Good parental controls. Helpful technical support.", tablet, amazon);
         expected.setId(4);
         instance.add(expected);
@@ -47,13 +47,14 @@ public abstract class ProductDaoTest<T extends ProductDao> {
 
     @Test
     public void testOnlyThreeProducts() {
-        assertEquals(null, instance.find(4));
+        assertEquals(3, instance.getAll().size());
     }
 
     @Test
     public void testRemove() {
+        int oldSize = instance.getAll().size();
         instance.remove(1);
-        assertEquals(null, instance.find(1));
+        assertEquals(oldSize-1, instance.getAll().size());
     }
 
     @Test
@@ -105,6 +106,7 @@ class ProductDaoJDBCTest extends ProductDaoTest<ProductDaoJDBC> {
     @Override
     public void setUpInstance(){
         instance = createInstance();
+        TestDataJDBC.executeSqlScript(new java.io.File("tests/reset_data.sql"));
     }
 
 }

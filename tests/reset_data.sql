@@ -91,7 +91,6 @@ ALTER TABLE ONLY supplier
     ADD CONSTRAINT pk_supplier_id PRIMARY KEY (id);
 
 
-
 ALTER TABLE ONLY orders
     ADD CONSTRAINT fk_user_data_id FOREIGN KEY (user_data_id) REFERENCES user_data(id);
 
