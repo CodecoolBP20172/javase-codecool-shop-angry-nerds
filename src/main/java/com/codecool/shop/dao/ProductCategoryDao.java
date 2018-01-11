@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface ProductCategoryDao {
 
-    void add(ProductCategory category);
+    void add(ProductCategory category) throws IllegalArgumentException;
     ProductCategory find(int id);
     void remove(int id);
 

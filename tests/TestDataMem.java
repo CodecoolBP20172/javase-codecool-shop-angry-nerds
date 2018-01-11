@@ -18,13 +18,23 @@ public class TestDataMem {
     private static ProductCategoryDaoMem productCategoryDaoMem = ProductCategoryDaoMem.getInstance();
     private static OrderDaoMem orderDaoMem = OrderDaoMem.getInstance();
     private static CartDaoMem cartDaoMem = CartDaoMem.getInstance();
+    static ProductCategory notebook;
+    static ProductCategory tablet;
+    static ProductCategory audio;
+    static ProductCategory electronics;
+    static Supplier amazon;
+    static Supplier lenovo;
+    static Supplier apple;
 
     protected static void fillInstances() {
         clearInstances();
-        Supplier amazon = new Supplier("Amazon", "Digital content and services");
-        Supplier lenovo = new Supplier("Lenovo", "Computers");
-        ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
-        ProductCategory notebook = new ProductCategory("Notebook", "Hardware", "A portable computer.");
+        amazon = new Supplier("Amazon", "Digital content and services");
+        lenovo = new Supplier("Lenovo", "Computers");
+        apple = new Supplier("Apple", "Computers");
+        notebook = new ProductCategory("Notebook", "Hardware", "A portable computer.");
+        tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
+        audio = new ProductCategory("Audio", "Hardware", "bla bla");
+        electronics = new ProductCategory("Electronics", "Hardware", "bla bla");
 
         Product product1 = new Product("Amazon Fire", 49.9f, "USD", "Fantastic price. Large content ecosystem. Good parental controls. Helpful technical support.", tablet, amazon);
         Product product2 = new Product("Lenovo IdeaPad Miix 700", 479, "USD", "Keyboard cover is included. Fanless Core m5 processor. Full-size USB ports. Adjustable kickstand.", tablet, lenovo);
@@ -36,15 +46,18 @@ public class TestDataMem {
             userData.put(list.get(i), data.get(i));
         };
 
-        supplierDaoMem.add(amazon);
-        supplierDaoMem.add(lenovo);
-
-        productCategoryDaoMem.add(tablet);
-        productCategoryDaoMem.add(notebook);
-
         productDaoMem.add(product1);
         productDaoMem.add(product2);
         productDaoMem.add(product3);
+
+        productCategoryDaoMem.add(notebook);
+        productCategoryDaoMem.add(tablet);
+        productCategoryDaoMem.add(audio);
+        productCategoryDaoMem.add(electronics);
+
+        supplierDaoMem.add(amazon);
+        supplierDaoMem.add(lenovo);
+        supplierDaoMem.add(apple);
 
         cartDaoMem.add(product1);
         cartDaoMem.add(product1);

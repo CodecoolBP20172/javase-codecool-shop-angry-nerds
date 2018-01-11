@@ -24,7 +24,8 @@ public class SupplierDaoMem implements SupplierDao {
     }
 
     @Override
-    public void add(Supplier supplier) {
+    public void add(Supplier supplier) throws IllegalArgumentException{
+        if (supplier == null) throw new IllegalArgumentException();
         supplier.setId(DATA.size() + 1);
         DATA.add(supplier);
     }
