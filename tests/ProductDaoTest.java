@@ -47,13 +47,14 @@ public abstract class ProductDaoTest<T extends ProductDao> {
 
     @Test
     public void testOnlyThreeProducts() {
-        assertEquals(null, instance.find(4));
+        assertEquals(3, instance.getAll().size());
     }
 
     @Test
     public void testRemove() {
+        int oldSize = instance.getAll().size();
         instance.remove(1);
-        assertEquals(null, instance.find(1));
+        assertEquals(oldSize-1, instance.getAll().size());
     }
 
     @Test
