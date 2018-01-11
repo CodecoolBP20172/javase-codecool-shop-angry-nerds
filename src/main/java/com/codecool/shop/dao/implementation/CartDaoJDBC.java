@@ -25,16 +25,15 @@ public class CartDaoJDBC implements CartDao {
         if (product == null) {
             throw new IllegalArgumentException();
         }
-        try {
-            ConnectionHandler conn = new ConnectionHandler();
-            ResultSet resultSet= conn.process("SELECT * FROM Cart");
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            ResultSet resultSet= conn.process("SELECT * FROM cart");
             String productList = null;
             while (resultSet.next()) {
                 productList = resultSet.getString(2);
             }
             List<TypeCaster> args = new ArrayList<>();
-            args.add(new TypeCaster(productList + "," + product.getId(),false));
-            conn.execute("UPDATE Cart SET product_list = ?",args);
+            args.add(new TypeCaster(productList + "," + Integer.toString(product.getId()),false));
+            conn.execute("UPDATE cart SET product_list = ?",args);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -43,15 +42,15 @@ public class CartDaoJDBC implements CartDao {
 
     @Override
     public Map<Product, Integer> getAll() {
-        try {
-            ConnectionHandler conn = new ConnectionHandler();
-            ResultSet resultSet= conn.process("SELECT * FROM Cart");
+        Map<Product, Integer> resultMap= new HashMap<>();
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            ResultSet resultSet= conn.process("SELECT * FROM cart");
             String productList = null;
-            Map<Product, Integer> resultMap= new HashMap<>();
             while (resultSet.next()) {
                 productList = resultSet.getString(2);
             }
             List<String> productIdList = Arrays.asList(productList.split("\\s*,\\s*"));
+            System.out.println(productIdList);
             for(String str: productIdList){
                 Product product = ProductDaoJDBC.getInstance().find(Integer.parseInt(str));
                 if (resultMap.containsKey(product)) {
@@ -60,11 +59,12 @@ public class CartDaoJDBC implements CartDao {
                     resultMap.put(product,1);
                 }
             }
-            return resultMap;
+
         } catch (SQLException e) {
             e.printStackTrace();
-            return null;
+
         }
+        return resultMap;
     }
 
 
@@ -75,9 +75,8 @@ public class CartDaoJDBC implements CartDao {
 
     @Override
     public void clearCart() {
-        try {
-            ConnectionHandler conn = new ConnectionHandler();
-            conn.execute("DELETE FROM Cart");
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            conn.execute("DELETE FROM cart");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -86,11 +85,9 @@ public class CartDaoJDBC implements CartDao {
 
     @Override
     public void remove(int id) {
-        try {
-            ConnectionHandler conn = new ConnectionHandler();
-            ResultSet resultSet= conn.process("SELECT * FROM Cart");
+        try  (ConnectionHandler conn = new ConnectionHandler()) {
+            ResultSet resultSet= conn.process("SELECT * FROM cart");
             String productList = null;
-            Map<Product, Integer> resultMap= new HashMap<>();
             while (resultSet.next()) {
                 productList = resultSet.getString(2);
             }
@@ -102,7 +99,7 @@ public class CartDaoJDBC implements CartDao {
             }
             List<TypeCaster> args = new ArrayList<>();
             args.add(new TypeCaster(arg,false));
-            conn.execute("UPDATE Cart SET product_list = ?",args);
+            conn.execute("UPDATE cart SET product_list = ?",args);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -116,24 +113,20 @@ public class CartDaoJDBC implements CartDao {
         if (quantity == 0) {
             remove(id);
         }
-        try {
-            ConnectionHandler conn = new ConnectionHandler();
+        try (ConnectionHandler conn = new ConnectionHandler()) {
             remove(id);
-            ResultSet resultSet = conn.process("SELECT * FROM Cart");
+            ResultSet resultSet = conn.process("SELECT * FROM cart");
             String productList = null;
             while (resultSet.next()) {
                 productList = resultSet.getString(2);
             }
-            String productIdList[] = productList.split(",");
             String quantityString = null;
             for (int i = 0; i<quantity; i++) {
                 quantityString += "," + id;
             }
             List<TypeCaster> args = new ArrayList<>();
             args.add(new TypeCaster(productList + "," + quantityString,false));
-            conn.execute("UPDATE Cart SET product_list = ?",args);
-
-
+            conn.execute("UPDATE cart SET product_list = ?",args);
         } catch (SQLException e) {
             e.printStackTrace();
         }

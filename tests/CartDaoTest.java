@@ -3,6 +3,7 @@
 import com.codecool.shop.dao.CartDao;
 import com.codecool.shop.dao.implementation.CartDaoJDBC;
 import com.codecool.shop.dao.implementation.CartDaoMem;
+import com.codecool.shop.dao.implementation.ProductDaoJDBC;
 import com.codecool.shop.model.Product;
 import com.codecool.shop.model.ProductCategory;
 import com.codecool.shop.model.Supplier;
@@ -40,8 +41,10 @@ public abstract class CartDaoTest<T extends CartDao> {
             Product product = products.get(random.nextInt(products.size()));
             if (i == 0) {
                 product = new Product("test", 1, "USD", "test descr",
+
                         new ProductCategory("testCat", "testDep", "testing"), new Supplier("testSupp", "supp"));
             }
+
             int oldValue = instance.getAll().get(product) == null ? 0 : instance.getAll().get(product);
             instance.add(product);
             assertEquals((int) instance.getAll().get(product), oldValue + 1);
@@ -56,8 +59,9 @@ public abstract class CartDaoTest<T extends CartDao> {
     @Test
     public void getAllWithAdd() {
         Map<Product, Integer> expectedMap = new HashMap<>(instance.getAll());
-        List<Product> products = new ArrayList<>(instance.getAll().keySet());
-        for (int i = 0; i < 100; i++) {
+        List<Product> products = ProductDaoJDBC.getInstance().getAll();
+
+        for (int i = 0; i < 20; i++) {
             Product product = products.get(random.nextInt(products.size()));
             instance.add(product);
             if (expectedMap.containsKey(product)) {
@@ -181,5 +185,6 @@ class cartDaoJdbcTests extends CartDaoTest<CartDaoJDBC> {
     @Override
     protected void setUpInstance() {
         instance = createInstance();
+        TestDataJDBC.executeSqlScript(new java.io.File("tests/reset_data.sql"));
     }
 }
