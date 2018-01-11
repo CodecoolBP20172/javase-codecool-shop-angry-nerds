@@ -36,8 +36,6 @@ public class TestDataMem {
             userData.put(list.get(i), data.get(i));
         };
 
-        Order order = new Order(cartDaoMem.getAll(), userData);
-
         supplierDaoMem.add(amazon);
         supplierDaoMem.add(lenovo);
 
@@ -53,7 +51,10 @@ public class TestDataMem {
         cartDaoMem.add(product2);
         cartDaoMem.add(product3);
 
+        Order order = new Order(cartDaoMem.getAll(), userData);
+
         orderDaoMem.add(order);
+
     }
 
     protected static void clearInstances() {

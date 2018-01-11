@@ -33,8 +33,34 @@ public class Order {
         this.id = id;
     }
 
+    @Override
+    public String toString() {
+        return "Order{" +
+                "id=" + id +
+                ", order=" + order +
+                ", userData=" + userData +
+                '}';
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        Order order1 = (Order) o;
+
+        if (getId() != order1.getId()) return false;
+        if (getOrder() != null ? !getOrder().equals(order1.getOrder()) : order1.getOrder() != null) return false;
+        return getUserData() != null ? getUserData().equals(order1.getUserData()) : order1.getUserData() == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getId();
+        result = 31 * result + (getOrder() != null ? getOrder().hashCode() : 0);
+        result = 31 * result + (getUserData() != null ? getUserData().hashCode() : 0);
+        return result;
+    }
 }
 
 

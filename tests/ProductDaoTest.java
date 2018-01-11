@@ -24,7 +24,14 @@ public abstract class ProductDaoTest<T extends ProductDao> {
 
     @Test
     public void testAdd() {
-
+        Supplier amazon = new Supplier("Amazon", "Digital content and services");
+        amazon.setId(1);
+        ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
+        tablet.setId(1);
+        Product expected = new Product("Amazon Fire", 49.9f, "USD", "Fantastic price. Large content ecosystem. Good parental controls. Helpful technical support.", tablet, amazon);
+        expected.setId(4);
+        instance.add(expected);
+        assertEquals(expected, instance.find(4));
     }
 
     @Test
@@ -39,34 +46,34 @@ public abstract class ProductDaoTest<T extends ProductDao> {
     }
 
     @Test
-    public void testTestFind() {
-        Supplier amazon = new Supplier("Amazon", "Digital content and services");
-        amazon.setId(1);
-        ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
-        tablet.setId(1);
-        Product expected = new Product("Amazon Fire", 49.9f, "USD", "Fantastic price. Large content ecosystem. Good parental controls. Helpful technical support.", tablet, amazon);
-        expected.setId(1);
-        assertEquals(expected, instance.find(4));
+    public void testOnlyThreeProducts() {
+        assertEquals(null, instance.find(4));
     }
 
     @Test
     public void testRemove() {
-
+        instance.remove(1);
+        assertEquals(null, instance.find(1));
     }
 
     @Test
     public void testGetAll() {
+        assertEquals(instance.getAll().size(), 3);
 
     }
 
     @Test
     public void testGetBySupplier() {
-
+        Supplier amazon = new Supplier("Amazon", "Digital content and services");
+        amazon.setId(1);
+        assertEquals(instance.getBy(amazon).size(), 2);
     }
 
     @Test
     public void testGetByProductCategory() {
-
+        ProductCategory tablet = new ProductCategory("Tablet", "Hardware", "A tablet computer, commonly shortened to tablet, is a thin, flat mobile computer with a touchscreen display.");
+        tablet.setId(1);
+        assertEquals(instance.getBy(tablet).size(), 3);
     }
 
 
