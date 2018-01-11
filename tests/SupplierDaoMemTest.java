@@ -1,6 +1,6 @@
 import com.codecool.shop.dao.implementation.SupplierDaoMem;
 
-class SupplierDoaMemTest extends SupplierDaoTest<SupplierDaoMem> {
+class SupplierDaoMemTest extends SupplierDaoTest<SupplierDaoMem> {
 
     @Override
     protected SupplierDaoMem createInstance() {
