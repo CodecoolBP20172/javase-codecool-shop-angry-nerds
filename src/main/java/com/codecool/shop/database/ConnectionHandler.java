@@ -47,9 +47,9 @@ public class ConnectionHandler implements AutoCloseable {
         for (int i = 0; i < listOfFieldLabels.size(); i++) {
             String content = listOfFieldLabels.get(i).getContent();
             if (listOfFieldLabels.get(i).isNumber()) {
-                pstm.setInt(i, Integer.parseInt(content));
+                pstm.setInt(i + 1, Integer.parseInt(content));
             } else {
-                pstm.setString(i, content);
+                pstm.setString(i + 1, content);
             }
         }
         return pstm;

@@ -1,8 +1,11 @@
 import com.codecool.shop.dao.ProductCategoryDao;
+import com.codecool.shop.database.ConnectionHandler;
 import com.codecool.shop.model.ProductCategory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -22,6 +25,7 @@ public abstract class ProductCategoryDaoTest<T extends ProductCategoryDao> {
     void initialize() {
         TestDataMem.clearInstances();
         TestDataMem.fillInstances();
+        TestDataJDBC.executeSqlScript(new File("tests/reset_data.sql"));
     }
 
     @Test
@@ -37,12 +41,11 @@ public abstract class ProductCategoryDaoTest<T extends ProductCategoryDao> {
     @Test
     void find() {
         assertEquals(TestDataMem.notebook,instance.find(TestDataMem.notebook.getId()));
-        assertEquals(TestDataMem.audio,instance.find(TestDataMem.audio.getId()));
     }
     @Test
     void remove() {
-        if (instance.getAll().contains(TestDataMem.notebook)) instance.remove(TestDataMem.notebook.getId());
-        assertFalse(instance.getAll().contains(TestDataMem.notebook));
+        if (instance.getAll().contains(TestDataMem.audio)) instance.remove(TestDataMem.audio.getId());
+        assertFalse(instance.getAll().contains(TestDataMem.audio));
     }
 
     @Test
