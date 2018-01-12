@@ -76,7 +76,7 @@ public class CartDaoJDBC implements CartDao {
 
     @Override
     public int getCount() {
-        return 0;
+        return getAll().size();
     }
 
     @Override
