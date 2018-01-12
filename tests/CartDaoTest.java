@@ -68,7 +68,7 @@ public abstract class CartDaoTest<T extends CartDao> {
         assertEquals(expectedMap, instance.getAll());
     }
 
-    /*@Test
+    @Test
     public void clear() {
         Map expectedMap = new HashMap();
         List<Product> products = new ArrayList<>(instance.getAll().keySet());
@@ -78,12 +78,12 @@ public abstract class CartDaoTest<T extends CartDao> {
         instance.clearCart();
         assertEquals(expectedMap, instance.getAll());
 
-    }*/
+    }
 
-    /*@Test
+    @Test
     public void removeIfWrongArg() {
         assertThrows(IllegalArgumentException.class, () -> instance.remove(0));
-    }*/
+    }
 
     @Test
     public void removeOne() {
@@ -91,7 +91,7 @@ public abstract class CartDaoTest<T extends CartDao> {
         Map<Product, Integer> IterateExpectedMap = new HashMap<>(instance.getAll());
 
         for (Product product: IterateExpectedMap.keySet()){
-            if (product.getName().equals("Amazon Fire HD 8")) {
+            if (product.getId() == 3) {
                 expectedMap.remove(product);
             }
         }
@@ -100,13 +100,13 @@ public abstract class CartDaoTest<T extends CartDao> {
         assertEquals(expectedMap, instance.getAll());
     }
 
-   /* @Test
+    @Test
     public void removeAll() {
         Map<Product, Integer> expectedMap = new HashMap<>(instance.getAll());
         Map<Product, Integer> IterateExpectedMap = new HashMap<>(instance.getAll());
 
         for (Product product: IterateExpectedMap.keySet()){
-            if (product.getName().equals("Amazon Fire HD 8") || product.getName().equals("Lenovo IdeaPad Miix 700") || product.getName().equals("Amazon Fire" )) {
+            if (product.getId() == 1 || product.getId() == 2 || product.getId() == 3) {
                 expectedMap.remove(product);
             }
         }
@@ -114,12 +114,12 @@ public abstract class CartDaoTest<T extends CartDao> {
         instance.remove(2);
         instance.remove(1);
         assertEquals(expectedMap, instance.getAll());
-    }*/
+    }
 
-    /*@Test
+    @Test
     public void setQuantityIfWrongId() {
         assertThrows(IllegalArgumentException.class, () -> instance.setQuantity(44,2));
-    }*/
+    }
 
     @Test
     public void setQuantityIfWrongQuantity() {
@@ -132,11 +132,11 @@ public abstract class CartDaoTest<T extends CartDao> {
         Map<Product, Integer> IterateExpectedMap = new HashMap<>(instance.getAll());
 
         for (Product product: IterateExpectedMap.keySet()){
-            if (product.getName().equals("Amazon Fire HD 8")) {
+            if (product.getId() == 2) {
                 expectedMap.remove(product);
             }
         }
-        instance.setQuantity(3,0);
+        instance.setQuantity(2,0);
         assertEquals(expectedMap, instance.getAll());
     }
 
@@ -144,11 +144,11 @@ public abstract class CartDaoTest<T extends CartDao> {
     public void setQuantity() {
         Map<Product, Integer> expectedMap = new HashMap<>(instance.getAll());
         for (Product product: expectedMap.keySet()){
-            if (product.getName().equals("Amazon Fire HD 8")) {
+            if (product.getId() == 1) {
                 expectedMap.put(product,6);
             }
         }
-        instance.setQuantity(3,6);
+        instance.setQuantity(1,6);
         assertEquals(expectedMap,instance.getAll());
     }
 
