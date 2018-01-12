@@ -51,6 +51,7 @@ public class ProductDaoJDBC implements ProductDao {
             list.add(new TypeCaster(Integer.toString(id), true));
             ResultSet rs = con.process("SELECT * FROM product WHERE id = ?", list);
             List<Product> productList = getProductsFromResultSet(rs);
+            System.out.println(productList);
             product = productList.get(0);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -102,7 +103,10 @@ public class ProductDaoJDBC implements ProductDao {
             String description = rs.getString("description");
             int  product_category_id = rs.getInt("product_category_id");
             int supplier_id = rs.getInt("supplier_id");
-            productList.add(new Product(name, default_price, default_currency, description, ProductCategoryDaoJDBC.getInstance().find(product_category_id), SupplierDaoJDBC.getInstance().find(supplier_id)));
+            int product_id = rs.getInt("id");
+            Product product = new Product(name, default_price, default_currency, description, ProductCategoryDaoJDBC.getInstance().find(product_category_id), SupplierDaoJDBC.getInstance().find(supplier_id));
+            product.setId(product_id);
+            productList.add(product);
         }
         return productList;
     }
