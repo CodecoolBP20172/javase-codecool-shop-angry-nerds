@@ -76,7 +76,11 @@ public class CartDaoJDBC implements CartDao {
 
     @Override
     public int getCount() {
-        return 0;
+        Integer count=0;
+        for (Integer value: getAll().values()) {
+            count += value;
+        }
+        return count;
     }
 
     @Override
