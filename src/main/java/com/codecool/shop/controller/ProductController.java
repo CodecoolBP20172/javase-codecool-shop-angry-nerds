@@ -15,11 +15,11 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class ProductController {
-    private static ProductDao productDataStore = ProductDaoMem.getInstance();
-    private static ProductCategoryDao productCategoryDataStore = ProductCategoryDaoMem.getInstance();
-    private static SupplierDao supplierDataStore = SupplierDaoMem.getInstance();
-    private static CartDao cartData = CartDaoMem.getInstance();
-    private static OrderDao orderData = OrderDaoMem.getInstance();
+    private static ProductDao productDataStore = ProductDaoJDBC.getInstance();
+    private static ProductCategoryDao productCategoryDataStore = ProductCategoryDaoJDBC.getInstance();
+    private static SupplierDao supplierDataStore = SupplierDaoJDBC.getInstance();
+    private static CartDao cartData = CartDaoJDBC.getInstance();
+    private static OrderDao orderData = OrderDaoJDBC.getInstance();
 
     public static ModelAndView renderProducts(Request req, Response res) {
 
