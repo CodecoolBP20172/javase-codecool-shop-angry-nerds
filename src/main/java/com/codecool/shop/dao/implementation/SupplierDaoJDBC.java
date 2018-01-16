@@ -31,7 +31,7 @@ public class SupplierDaoJDBC implements SupplierDao{
     @Override
     public void add(Supplier supplier) throws IllegalArgumentException {
         if (supplier == null) {
-            logger.debug("SupplierDaoJDBC add method recieved invalid argument");
+            logger.debug("SupplierDaoJDBC add method received invalid argument");
             throw new IllegalArgumentException();
         }
         String query = "INSERT INTO supplier (name, description) VALUES (?,?);";
@@ -53,7 +53,7 @@ public class SupplierDaoJDBC implements SupplierDao{
     public Supplier find(int id) {
         String query = "SELECT * FROM supplier WHERE id = ?;";
         List<Supplier> supplierList = new ArrayList<>();
-        
+
         try(ConnectionHandler conn = new ConnectionHandler()) {
             ArrayList<TypeCaster> queryList = new ArrayList<>();
             queryList.add(new TypeCaster(String.valueOf(id), true));

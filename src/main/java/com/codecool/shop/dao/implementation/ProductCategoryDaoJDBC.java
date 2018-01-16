@@ -31,7 +31,7 @@ public class ProductCategoryDaoJDBC implements ProductCategoryDao{
     @Override
     public void add(ProductCategory category) throws IllegalArgumentException {
         if (category == null) {
-            logger.debug("ProductCategoryDaoJDBC add method recieved invalid argument");
+            logger.debug("ProductCategoryDaoJDBC add method received invalid argument");
             throw new IllegalArgumentException();
         }
         String query = "INSERT INTO product_category (name, description, department) VALUES (?,?,?);";
@@ -53,7 +53,7 @@ public class ProductCategoryDaoJDBC implements ProductCategoryDao{
     public ProductCategory find(int id) {
         String query = "SELECT * FROM product_category WHERE id = ?;";
         List<ProductCategory> categoryList = new ArrayList<>();
-        
+
         try(ConnectionHandler conn = new ConnectionHandler()) {
             ArrayList<TypeCaster> list = new ArrayList<>();
             list.add(new TypeCaster(String.valueOf(id), true));
@@ -70,7 +70,7 @@ public class ProductCategoryDaoJDBC implements ProductCategoryDao{
             logger.warn("Connection to database failed while trying to find product category in database");
         }
         if (categoryList.size() > 0) {
-            logger.debug("Product category found and returned");
+            logger.debug("Product category found in memory and returned");
             return categoryList.get(0);
         }
         else {
