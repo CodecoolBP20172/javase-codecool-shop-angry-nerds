@@ -45,12 +45,12 @@ public class ProductController {
         params.put("cartSize", cartData.getCount());
         if (supOrCat.equals("supplier")){
             Supplier supplier = supplierDataStore.find(Integer.parseInt(id));
-            logger.warn("Find supplier by id {} = {}", id, supplier);
+            logger.debug("Find supplier by id {} = {}", id, supplier);
             params.put("title", supOrCat + " : " +  supplier.getName());
             params.put("products", productDataStore.getBy(supplier));
         } else if ( supOrCat.equals("category")) {
             ProductCategory productCategory = productCategoryDataStore.find(Integer.parseInt(id));
-            logger.warn("Find category by id {} = {}", id, productCategory);
+            logger.debug("Find category by id {} = {}", id, productCategory);
             params.put("title", supOrCat + " : " +  productCategory.getName());
             params.put("products", productDataStore.getBy(productCategory));
         } else {
@@ -87,7 +87,7 @@ public class ProductController {
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
         Product product = productDataStore.find(Integer.parseInt(id));
-        logger.warn("Find product by id {} = {}", id, product);
+        logger.debug("Find product by id {} = {}", id, product);
         cartData.add(product);
         params.put("cartSize", cartData.getCount());
         logger.debug("Rendering index page with params: {}", params);
