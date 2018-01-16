@@ -25,7 +25,7 @@ public class ProductController {
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     public static ModelAndView renderProducts(Request req, Response res) {
-
+        logger.info("Rendering index page with all the products...");
         Map params = new HashMap<>();
         params.put("title", "All products");
         params.put("categories", productCategoryDataStore.getAll());
@@ -37,6 +37,7 @@ public class ProductController {
     }
 
     public static ModelAndView renderProductsBy(String supOrCat, String id) {
+        logger.info("Sorting index page by: {}", supOrCat);
         logger.debug("Args: supOrCat: {}, id: {}",supOrCat,id);
         Map params = new HashMap<>();
         params.put("categories", productCategoryDataStore.getAll());
@@ -77,6 +78,7 @@ public class ProductController {
     }
 
     public static ModelAndView addProduct(String id) {
+        logger.info("Adding product to cart...");
         Map params = new HashMap<>();
         params.put("title", "All products");
         params.put("products", productDataStore.getAll());
@@ -91,6 +93,7 @@ public class ProductController {
     }
 
     public static ModelAndView renderCart() {
+        logger.info("Rendering cart...");
         int sumPrice = 0;
         String firstCurrency = null;
         String nextCurrency = null;
@@ -126,7 +129,7 @@ public class ProductController {
     }
 
     public static void saveData(Request req){
-
+        logger.info("Saving order to file...");
         List<String> list = new ArrayList<>(Arrays.asList("Name", "E-mail", "Phone Number", "Billing Address", "Billing City", "Billing Zipcode", "Billing Country","Shipping Address", "Shipping City", "Shipping Zipcode",  "Shipping Country"));
         LinkedHashMap userData = new LinkedHashMap();
         JSONObject json = new JSONObject();
@@ -173,16 +176,18 @@ public class ProductController {
     }
 
     public static void removeProduct(Integer id) {
-        logger.info("Removing product with id: {}", id);
+        logger.info("Removing product...");
+        logger.debug("Removing product with id: {}", id);
         cartData.remove(id);
     }
 
     public static void changeQuantity(Integer id, Integer quantity){
+        logger.info("Changing quantity of a product..");
         if (quantity == 0) {
-            logger.info("Quantity = {}. Removing product with id: {}",quantity, id);
+            logger.debug("Quantity = {}. Removing product with id: {}",quantity, id);
             cartData.remove(id);
         } else {
-            logger.info("Quantity = {}. Setting quantity of the product with id: {}",quantity, id);
+            logger.debug("Quantity = {}. Setting quantity of the product with id: {}",quantity, id);
             cartData.setQuantity(id, quantity);
         }
 
