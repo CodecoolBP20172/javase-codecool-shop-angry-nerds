@@ -51,7 +51,6 @@ public class ProductDaoJDBC implements ProductDao {
             list.add(new TypeCaster(Integer.toString(id), true));
             ResultSet rs = con.process("SELECT * FROM product WHERE id = ?", list);
             List<Product> productList = getProductsFromResultSet(rs);
-            System.out.println(productList);
             product = productList.get(0);
         } catch (SQLException e) {
             e.printStackTrace();

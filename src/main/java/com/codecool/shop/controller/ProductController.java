@@ -13,6 +13,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ProductController {
     private static ProductDao productDataStore = ProductDaoJDBC.getInstance();
@@ -20,6 +22,7 @@ public class ProductController {
     private static SupplierDao supplierDataStore = SupplierDaoJDBC.getInstance();
     private static CartDao cartData = CartDaoJDBC.getInstance();
     private static OrderDao orderData = OrderDaoJDBC.getInstance();
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
     public static ModelAndView renderProducts(Request req, Response res) {
 
@@ -29,6 +32,7 @@ public class ProductController {
         params.put("suppliers", supplierDataStore.getAll());
         params.put("products", productDataStore.getAll());
         params.put("cartSize", cartData.getCount());
+        logger.warn("Rendering index page with params:{}",params);
         return new ModelAndView(params, "product/index");
     }
 
@@ -37,7 +41,6 @@ public class ProductController {
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
         params.put("cartSize", cartData.getCount());
-        System.out.println(supOrCat + id);
         if (supOrCat.equals("supplier")){
             Supplier supplier = supplierDataStore.find(Integer.parseInt(id));
             params.put("title", supOrCat + " : " +  supplier.getName());
@@ -49,7 +52,6 @@ public class ProductController {
         } else {
             return new ModelAndView(params, "404");
         }
-        System.out.println(params);
         return new ModelAndView(params, "product/index");
     }
 
@@ -76,6 +78,8 @@ public class ProductController {
         Product product = productDataStore.find(Integer.parseInt(id));
         cartData.add(product);
         params.put("cartSize", cartData.getCount());
+        logger.warn("why u no work");
+
 
         return new ModelAndView(params, "product/index");
     }

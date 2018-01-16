@@ -110,7 +110,6 @@ public class CartDaoJDBC implements CartDao {
             }
             List<TypeCaster> args = new ArrayList<>();
             args.add(new TypeCaster(arg.toString().substring(0,arg.length()-1),false));
-            System.out.println(arg.toString().substring(0,arg.length()-1));
             conn.execute("UPDATE cart SET product_list = ?",args);
         } catch (SQLException e) {
             e.printStackTrace();
