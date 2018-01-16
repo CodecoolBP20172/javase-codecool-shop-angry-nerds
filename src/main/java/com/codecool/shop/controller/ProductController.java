@@ -63,6 +63,7 @@ public class ProductController {
 
 
     public static ModelAndView forms(String title) {
+        logger.info("Rendering forms page with title: {}", title);
         Map params = new HashMap<>();
         params.put("title", title);
         logger.debug("Rendering forms page with params: {}", params);
@@ -70,6 +71,7 @@ public class ProductController {
     }
 
     public static ModelAndView forms(String title, String method) {
+        logger.info("Rendering forms page with title: {}", title);
         Map params = new HashMap<>();
         params.put("title", title);
         params.put("method", method);
