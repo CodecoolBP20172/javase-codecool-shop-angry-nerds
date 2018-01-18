@@ -1,6 +1,8 @@
 package com.codecool.shop.model;
 
-import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Map;
 import java.util.Properties;
 
@@ -14,6 +16,9 @@ import javax.mail.internet.MimeMessage;
 
 public class Email {
 
+    private static final Logger logger = LoggerFactory.getLogger(Email.class);
+
+
     public static void sendEmail(Order order) {
 
         final String username = "codecoolshop.angrynerds@gmail.com";
@@ -25,10 +30,13 @@ public class Email {
         props.put("mail.smtp.starttls.enable", "true");
         props.put("mail.smtp.host", "smtp.gmail.com");
         props.put("mail.smtp.port", "587");
+        logger.trace("Properties set up");
+
 
         Session session = Session.getInstance(props,
                 new javax.mail.Authenticator() {
                     protected PasswordAuthentication getPasswordAuthentication() {
+                        logger.trace("Session created");
                         return new PasswordAuthentication(username, password);
                     }
                 });
@@ -59,12 +67,14 @@ public class Email {
                     + "\n\n We wish You merry christmas and hope You will shop with us next time!"
                     + "\n Best regards,"
                     + "\n\n Your CodeCool Shop");
+            logger.trace("E-mail created");
 
             Transport.send(message);
 
-            System.out.println("Done");
+            logger.debug("E-mail sent");
 
         } catch (MessagingException e) {
+            logger.warn("An error occured during the process of sending out confirmation e-mail");
             throw new RuntimeException(e);
         }
 
@@ -83,6 +93,7 @@ public class Email {
         }
         orderString += "\n --------------------------------------------------";
         orderString += "\n Total amount paid:        " + String.valueOf(total) + " USD";
+        logger.trace("Concatenated order into string format to be able to insert it into e-mail");
         return orderString;
     }
 
