@@ -7,6 +7,8 @@ import com.codecool.shop.model.BaseModel;
 import com.codecool.shop.model.Product;
 import com.codecool.shop.model.ProductCategory;
 import com.codecool.shop.model.Supplier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -15,6 +17,7 @@ import java.util.List;
 
 public class ProductDaoJDBC implements ProductDao {
     private static ProductDaoJDBC instance = null;
+    private static final Logger logger = LoggerFactory.getLogger(ProductDaoJDBC.class);
 
     private ProductDaoJDBC() {
     }
@@ -23,6 +26,7 @@ public class ProductDaoJDBC implements ProductDao {
         if (instance == null) {
             instance = new ProductDaoJDBC();
         }
+        logger.debug("ProductDaoJDBC instance created");
         return instance;
     }
 
@@ -36,9 +40,10 @@ public class ProductDaoJDBC implements ProductDao {
             list.add(new TypeCaster(product.getDescription(), false));
             list.add(new TypeCaster(Integer.toString(product.getProductCategory().getId()), true));
             list.add(new TypeCaster(Integer.toString(product.getSupplier().getId()), true));
-
             con.process("INSERT INTO product VALUES (DEFAULT, ?, ?, ?,  ?, ?, ?);", list);
+            logger.debug("Product added to database");
         } catch (SQLException e) {
+            logger.warn("Connection to database failed while adding product to database");
             e.printStackTrace();
         }
     }
@@ -52,7 +57,9 @@ public class ProductDaoJDBC implements ProductDao {
             ResultSet rs = con.process("SELECT * FROM product WHERE id = ?", list);
             List<Product> productList = getProductsFromResultSet(rs);
             product = productList.get(0);
+            logger.debug("Product found in database by id {}", id);
         } catch (SQLException e) {
+            logger.warn("Connection to database failed while finding product from database");
             e.printStackTrace();
         }
         return product;
@@ -64,7 +71,9 @@ public class ProductDaoJDBC implements ProductDao {
             List<TypeCaster> list = new ArrayList<>();
             list.add(new TypeCaster(Integer.toString(id), true));
             con.process("DELETE FROM product WHERE id = ?", list);
+            logger.debug("Product removed from database by id {}", id);
         } catch (SQLException e) {
+            logger.warn("Connection to database failed while removing product from database");
             e.printStackTrace();
         }
     }
@@ -75,7 +84,9 @@ public class ProductDaoJDBC implements ProductDao {
         try (ConnectionHandler con = new ConnectionHandler()){
             ResultSet rs = con.process("SELECT * FROM product");
             productList = getProductsFromResultSet(rs);
+            logger.debug("Getting all products from database");
         } catch (SQLException e) {
+            logger.warn("Connection to database failed while getting supplier all products");
             e.printStackTrace();
         }
         return productList;
@@ -84,12 +95,14 @@ public class ProductDaoJDBC implements ProductDao {
     @Override
     public List<Product> getBy(Supplier supplier) {
         List<Product> productList = getProductBySupOrPC(supplier, "supplier_id");
+        logger.debug("Getting all products from database by supplier {}", supplier.getName());
         return productList;
     }
 
     @Override
     public List<Product> getBy(ProductCategory productCategory) {
         List<Product> productList = getProductBySupOrPC(productCategory, "product_category_id");
+        logger.debug("Getting all products from database by product category {}", productCategory.getName());
         return productList;
     }
 
@@ -123,6 +136,7 @@ public class ProductDaoJDBC implements ProductDao {
             }
             productList = getProductsFromResultSet(rs);
         } catch (SQLException e) {
+            logger.warn("Connection to database failed while getting all products by supplier/category from database");
             e.printStackTrace();
         }
         return productList;

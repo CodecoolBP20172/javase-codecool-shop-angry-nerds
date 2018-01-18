@@ -43,7 +43,6 @@ public class ProductCategory extends BaseModel {
     }
 
     public String toString() {
-        logger.trace("The toString format of product category {} is {}", this.name, this.toString());
         return String.format(
                 "id: %1$d," +
                         "name: %2$s, " +
