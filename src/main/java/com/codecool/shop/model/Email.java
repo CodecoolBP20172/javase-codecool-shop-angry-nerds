@@ -14,11 +14,31 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+/**
+ * This class serves the purpose of sending out confirmation e-mails after an order was made in the shop.
+ * It consists of two methods. While the sendEmail method first sets up the appropriate environment and then
+ * sends out the corresponding e-mail, the convertOrder concatenates the items from the order to a string so
+ * the sendEmail can then use it.
+ *
+ * @author  Peter Bernath
+ * @version 1.0
+ * @since   2018-01-17
+ */
 public class Email {
 
     private static final Logger logger = LoggerFactory.getLogger(Email.class);
 
 
+    /**
+     * This methods sends out confirmation e-mails after an order.
+     * <p>
+     * It has 2 private fields, where the developer can set up the username and password for the email
+     * address, from which the confirmation e-mails will be sent out. Then it sets up the properties
+     * and creates a session with them. Then it sets up recipients, subject and finally concatenates a short
+     * message with all the order information and sends it out to the customer. If the sending was unsuccessful,
+     * it throws a RuntimeException.
+     * @param order the parameter is used to get information about the order which is then composed to the e-mail
+     */
     public static void sendEmail(Order order) {
 
         final String username = "codecoolshop.angrynerds@gmail.com";
@@ -80,6 +100,12 @@ public class Email {
 
     }
 
+    /**
+     * This simple method concatenates the items from an order into a string so the sendEmail method can then
+     * easily use it during message composing.
+     * @param map this map is basically a product list which contains all the ordered products and the count of them
+     * @return the method returns the order in string format
+     */
     private static String convertOrder(Map<Product, Integer> map) {
         String orderString = "";
         int total = 0;
