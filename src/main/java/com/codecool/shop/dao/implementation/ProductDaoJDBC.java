@@ -12,20 +12,38 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+/**
+ * This is a simple product data access object which serves the Product class and helpes it to
+ * communicate with the database.
+ * <p>
+ * It implements the ProductDao interface.
+ *
+ * @author  Márton Ollári
+ * @version 1.0
+ * @since   2018-01-20
+ */
 public class ProductDaoJDBC implements ProductDao {
     private static ProductDaoJDBC instance = null;
 
     private ProductDaoJDBC() {
     }
-
+    /**
+     * This method checks if an instance does not already exist. If not, a new instance of the class is created and
+     * assigned to the instance variable. If an existing instance is available, the getInstance method returns this.
+     * The result is that the returned value is always the same instance, and no new resource or overhead is required.
+     * @return a single instance of the class
+     */
     public static ProductDaoJDBC getInstance() {
         if (instance == null) {
             instance = new ProductDaoJDBC();
         }
         return instance;
     }
-
+    /**
+     * This method adds a Product to the database. It has
+     * one parameter, which is a Product that gets inserted into the database.
+     * @param product the Product that gets added to the database
+     */
     @Override
     public void add(Product product) {
         try (ConnectionHandler con = new ConnectionHandler()){
@@ -42,7 +60,13 @@ public class ProductDaoJDBC implements ProductDao {
             e.printStackTrace();
         }
     }
-
+    /**
+     * This method searches for the Product in the database, based on the id of the product.
+     * If it does not find the Product, it returns null. However if the Product is
+     * found based on the id than it gets returned.
+     * @param id the Product will be searched for based on this id
+     * @return the Product, which has the corresponding id
+     */
     @Override
     public Product find(int id) {
         Product product = null;
@@ -58,7 +82,10 @@ public class ProductDaoJDBC implements ProductDao {
         }
         return product;
     }
-
+    /**
+     * This method finds and removes the Product from the database, based on the id given as parameter.
+     * @param id the Product will be removed based on this id
+     */
     @Override
     public void remove(int id) {
         try (ConnectionHandler con = new ConnectionHandler()){
@@ -69,7 +96,11 @@ public class ProductDaoJDBC implements ProductDao {
             e.printStackTrace();
         }
     }
-
+    /**
+     * This method gets all the products from the memory and returns them in an ArrayList.
+     * Use {@link #getProductsFromResultSet(ResultSet)} to change the result set into an ArrayList
+     * @return an ArrayList, which contains all the products
+     */
     @Override
     public List<Product> getAll() {
         List<Product> productList = null;
@@ -81,19 +112,36 @@ public class ProductDaoJDBC implements ProductDao {
         }
         return productList;
     }
-
+    /**
+     * This method gets all the products from the database which has the same supplier,
+     * as the supplier given as a parameter, and returns them in an ArrayList.
+     * Use {@link #getProductBySupOrPC(BaseModel, String)}
+     * @param  supplier the Supplier to get the Products
+     * @return an ArrayList, which contains all the products with the same supplier
+     */
     @Override
     public List<Product> getBy(Supplier supplier) {
         List<Product> productList = getProductBySupOrPC(supplier, "supplier_id");
         return productList;
     }
-
+    /**
+     * This method gets all the products from the database which has the same category,
+     * as the category given as a parameter, and returns them in an ArrayList.
+     * Use {@link #getProductBySupOrPC(BaseModel, String)}
+     * @param  productCategory the ProductCategory to get the Products
+     * @return an ArrayList, which contains all the products with the same supplier
+     */
     @Override
     public List<Product> getBy(ProductCategory productCategory) {
         List<Product> productList = getProductBySupOrPC(productCategory, "product_category_id");
         return productList;
     }
-
+    /**
+     * This method gets all the products from the database which has the same category,
+     * as the category given as a parameter, and returns them in an ArrayList.
+     * @param  rs a ResultSet from the database
+     * @return an ArrayList of Products from the ResultSet
+     */
     private List<Product> getProductsFromResultSet(ResultSet rs) throws SQLException {
         List<Product> productList = new ArrayList<>();
         while (rs.next()){
@@ -110,13 +158,20 @@ public class ProductDaoJDBC implements ProductDao {
         }
         return productList;
     }
-
+    /**
+     * This method gets all the products from the database which has the same category,
+     * as the category given as a parameter, and returns them in an ArrayList.
+     * Use {@link #getProductsFromResultSet(ResultSet)} to change the result set into an ArrayList
+     * @param  model a Supplier or ProductCategory to get the Products
+     * @param  supOrPC a String for the query to get the product from the database
+     * @return an ArrayList, which contains all the products with the same supplier
+     */
     private List<Product> getProductBySupOrPC(BaseModel model, String supOrPC){
         List<Product> productList = null;
         try (ConnectionHandler con = new ConnectionHandler()){
             List<TypeCaster> list = new ArrayList<>();
             list.add(new TypeCaster(Integer.toString(model.getId()), true));
-            ResultSet rs = null;
+            ResultSet rs;
             if (supOrPC == "supplier_id"){
                 rs = con.process("SELECT * FROM product WHERE supplier_id = ?", list);
             } else {
