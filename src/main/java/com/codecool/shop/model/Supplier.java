@@ -63,7 +63,6 @@ public class Supplier extends BaseModel {
      * @return the new string format of the Supplier class
      */
     public String toString() {
-        logger.trace("The toString format of supplier {} is {}", this.name, this.toString());
         return String.format("id: %1$d, " +
                         "name: %2$s, " +
                         "description: %3$s",
