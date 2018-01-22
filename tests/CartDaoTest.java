@@ -170,7 +170,7 @@ class cartDaoMemTests extends CartDaoTest<CartDaoMem> {
 
 }
 
-class cartDaoJdbcTests extends CartDaoTest<CartDaoJDBC> {
+class   cartDaoJdbcTests extends CartDaoTest<CartDaoJDBC> {
 
     @Override
     protected CartDaoJDBC createInstance() {

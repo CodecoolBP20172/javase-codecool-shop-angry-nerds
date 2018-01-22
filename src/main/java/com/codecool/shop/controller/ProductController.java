@@ -16,6 +16,17 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ *This java class is the bridge between the server and the JDBC classes.
+ * <p>
+ *It's called from the server and corresponding to the request it takes and returns
+ *the information as params alongside with a html shell.
+ *
+ * @author  Matthew Summer
+ * @version 4.20
+ * @since   2018-01-21
+ */
+
 public class ProductController {
     private static ProductDao productDataStore = ProductDaoJDBC.getInstance();
     private static ProductCategoryDao productCategoryDataStore = ProductCategoryDaoJDBC.getInstance();
@@ -24,6 +35,14 @@ public class ProductController {
     private static OrderDao orderData = OrderDaoJDBC.getInstance();
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
+
+    /**
+     * Called with the root "/".
+     * @param req unused
+     * @param res unused
+     * @return Returns the title of the page, the categories,
+     * suppliers,products, cart size and the index html form.
+     */
     public static ModelAndView renderProducts(Request req, Response res) {
         logger.info("Rendering index page with all the products...");
         Map params = new HashMap<>();
@@ -35,6 +54,14 @@ public class ProductController {
         logger.debug("Rendering index page with params:{}",params);
         return new ModelAndView(params, "product/index");
     }
+
+    /**
+     * This method is to filter products at the index page by a supplier or category.
+     * @param supOrCat supplier or category.
+     * @param id supplier's or the category's id.
+     * @return Returns the title of the page, the categories,
+     * suppliers,products filtered by the params, cart size and the index html form.
+     */
 
     public static ModelAndView renderProductsBy(String supOrCat, String id) {
         logger.info("Sorting index page by: {}", supOrCat);
@@ -61,6 +88,11 @@ public class ProductController {
         return new ModelAndView(params, "product/index");
     }
 
+    /**
+     * This lovely method is for the forms page.
+     * @param title title of the page
+     * @return returns the title param and forms html form.
+     */
 
     public static ModelAndView forms(String title) {
         logger.info("Rendering forms page with title: {}", title);
@@ -70,6 +102,12 @@ public class ProductController {
         return new ModelAndView(params, "forms");
     }
 
+    /**
+     * This one is an overloaded forms.
+     * @param title title of the page
+     * @param method holds information about desired payment method(credit card / paypal)
+     * @return title,method and forms html form
+     */
     public static ModelAndView forms(String title, String method) {
         logger.info("Rendering forms page with title: {}", title);
         Map params = new HashMap<>();
@@ -79,6 +117,11 @@ public class ProductController {
         return new ModelAndView(params, "forms");
     }
 
+    /**
+     * This one is to add products to the cart.
+     * @param id the product id which the user wished to add to cart.
+     * @return returns the index page! This one could seriously  use a refactor.
+     */
     public static ModelAndView addProduct(String id) {
         logger.info("Adding product to cart...");
         Map params = new HashMap<>();
@@ -93,6 +136,13 @@ public class ProductController {
         logger.debug("Rendering index page with params: {}", params);
         return new ModelAndView(params, "product/index");
     }
+
+    /**
+     * This method is to show the cart. It also sums up all items price in the cart and checks
+     * if the currency equals to one another.
+     * @return Returns the title, products in the cart, cart size, isError(if an error happened,
+     * this value will show), sum of the price, currency and the cart html form.
+     */
 
     public static ModelAndView renderCart() {
         logger.info("Rendering cart...");
@@ -130,6 +180,11 @@ public class ProductController {
 
     }
 
+    /**
+     * Saving order data to a file.
+     * @param req the order params
+     */
+
     public static void saveData(Request req){
         logger.info("Saving order to file...");
         List<String> list = new ArrayList<>(Arrays.asList("Name", "E-mail", "Phone Number", "Billing Address", "Billing City", "Billing Zipcode", "Billing Country","Shipping Address", "Shipping City", "Shipping Zipcode",  "Shipping Country"));
@@ -158,6 +213,12 @@ public class ProductController {
         }
     }
 
+
+    /**
+     * This method is for teh confirmation page. Also sends an email about it.
+     * @return Returns order, user data, the order ID, sum of the price,
+     * a message if the process was successful and the confirmation html form.
+     */
     public static ModelAndView confirmation() {
         int sumPrice = 0;
         Map params = new HashMap();
@@ -177,12 +238,22 @@ public class ProductController {
         return new ModelAndView(params, "confirmation");
     }
 
+    /**
+     * Calls the remove method for the target product from the cart.
+     * @param id product id which to remove.
+     */
     public static void removeProduct(Integer id) {
         logger.info("Removing product...");
         logger.debug("Removing product with id: {}", id);
         cartData.remove(id);
     }
 
+    /**
+     * Changes a quantity of the target product in the cart.
+     * If changed to 0, calls remove, otherwise setQuantity.
+     * @param id product id which to set quantity on.
+     * @param quantity numeric value of quantity to set on.
+     */
     public static void changeQuantity(Integer id, Integer quantity){
         logger.info("Changing quantity of a product..");
         if (quantity == 0) {
