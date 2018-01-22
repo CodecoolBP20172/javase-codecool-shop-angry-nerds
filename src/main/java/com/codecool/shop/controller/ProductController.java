@@ -266,4 +266,16 @@ public class ProductController {
 
     }
 
+    public static ModelAndView login(Request req, Response res){
+        Map params = new HashMap();
+        params.put("title", "Login");
+        return new ModelAndView(params, "login");
+    }
+
+    public static ModelAndView signUp(Request req, Response res){
+        Map params = new HashMap();
+        params.put("title", "Sign Up");
+        return new ModelAndView(params, "signUp");
+    }
+
 }

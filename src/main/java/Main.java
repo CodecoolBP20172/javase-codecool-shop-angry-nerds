@@ -63,6 +63,14 @@ public class Main {
             return new ThymeleafTemplateEngine().render(ProductController.confirmation());
         });
 
+        get("/login", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.login(req, res));
+        });
+
+        get("/sign-up", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.signUp(req, res));
+        });
+
         // Add this line to your project to enable the debug screen
         enableDebugScreen();
     }
