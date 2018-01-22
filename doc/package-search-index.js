@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"com.codecool.shop.controller"},{"l":"com.codecool.shop.dao"},{"l":"com.codecool.shop.dao.implementation"},{"l":"com.codecool.shop.database"},{"l":"com.codecool.shop.model"}]
