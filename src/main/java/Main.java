@@ -71,6 +71,14 @@ public class Main {
             return new ThymeleafTemplateEngine().render(ProductController.signUp(req, res));
         });
 
+//        post("/login", (Request req, Response res) -> {
+//            return new ThymeleafTemplateEngine().render(ProductController.checkLogin(req, res));
+//        });
+//
+//        post("/sign-up", (Request req, Response res) -> {
+//            return new ThymeleafTemplateEngine().render(ProductController.saveUserData(req, res));
+//        });
+
         // Add this line to your project to enable the debug screen
         enableDebugScreen();
     }
