@@ -1,5 +1,8 @@
 package com.codecool.shop.dao.implementation;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.codecool.shop.database.ConnectionHandler;
 import com.codecool.shop.database.TypeCaster;
 import com.codecool.shop.model.User;
@@ -9,8 +12,31 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * This is a simple user data access object which serves the ProductCategory class and helpes him to
+ * communicate with the database.
+ * <p>
+ * It should implement the UserDao interface which does not exist. So ...
+ * It has 1 method which is for searching for a user in the database.
+ *
+ * @author  Zsuzsa Petho
+ * @version 1.0
+ * @since   2018-01-20
+ */
 public class UserJDBC {
 
+    private static final Logger logger = LoggerFactory.getLogger(UserJDBC.class);
+
+    /**
+     * This method searches for the user in the database based on the id of the user.
+     * <p>
+     * It uses the ConnectionHandler class to establish connection to the database. If it fails, it
+     * logs a warning about connection failure, if it doesn't find the id in the DB, it returns null.
+     * However if the User is found based on the id than it gets returned.
+     * @param id the User will be searched for based on this id
+     * @return the User, which has the corresponding id
+     */
     public static User getUser(int id) {
         String query = "SELECT * FROM user_data WHERE id = ?";
         List<TypeCaster> list = new ArrayList <>();
@@ -34,8 +60,14 @@ public class UserJDBC {
                         shippingAddress, shippingCity, shippingZipcode, shippingCountry);
             }
         } catch (SQLException e) {
+            logger.warn("Connection to database failed while trying to find user in database");
             e.printStackTrace();
         }
+        if (user == null){
+            logger.warn("User not found in database");
+            return user;
+        }
+        logger.debug("User found in memory and returned");
         return user;
     }
 }

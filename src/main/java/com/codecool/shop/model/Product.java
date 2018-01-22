@@ -1,6 +1,8 @@
 package com.codecool.shop.model;
 
 import java.util.Currency;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 /**
  * This class serves as model for every product and holds all the information about each of them.
  * It extends the BaseModel abstract class from which it inherits its base fields like id, name and description,
@@ -11,12 +13,14 @@ import java.util.Currency;
  * @version 1.0
  * @since   2018-01-20
  */
+
 public class Product extends BaseModel {
 
     private float defaultPrice;
     private Currency defaultCurrency;
     private ProductCategory productCategory;
     private Supplier supplier;
+    private static final Logger logger = LoggerFactory.getLogger(Product.class);
 
     /**
      * The constructor of the Product class
@@ -32,12 +36,15 @@ public class Product extends BaseModel {
         this.setPrice(defaultPrice, currencyString);
         this.setSupplier(supplier);
         this.setProductCategory(productCategory);
+        logger.trace("Created instance of class Product with name {} and description {}", this.name, this.description);
+
     }
     /**
      * Gets the default price of the product
      * @return the default price of the product
      */
     public float getDefaultPrice() {
+        logger.trace("Product {} default price is {}", this.name, this.defaultPrice);
         return defaultPrice;
     }
     /**
@@ -45,6 +52,7 @@ public class Product extends BaseModel {
      * @param defaultPrice sets default price of the product
      */
     public void setDefaultPrice(float defaultPrice) {
+        logger.trace("Set products default price {} to {}", this.defaultPrice, defaultPrice);
         this.defaultPrice = defaultPrice;
     }
     /**
@@ -52,6 +60,7 @@ public class Product extends BaseModel {
      * @return the default currency of the product
      */
     public Currency getDefaultCurrency() {
+        logger.trace("Product {} default currency is {}", this.name, this.defaultCurrency);
         return defaultCurrency;
     }
     /**
@@ -59,6 +68,7 @@ public class Product extends BaseModel {
      * @param defaultCurrency sets default currency of the product
      */
     public void setDefaultCurrency(Currency defaultCurrency) {
+        logger.trace("Set products default currency {} to {}", this.defaultCurrency, defaultCurrency);
         this.defaultCurrency = defaultCurrency;
     }
     /**
@@ -66,6 +76,7 @@ public class Product extends BaseModel {
      * @return the price (a String with default price and currency) of the product
      */
     public String getPrice() {
+        logger.trace("Product {} price is {} {}", this.name, this.defaultPrice, this.defaultCurrency);
         return String.valueOf(this.defaultPrice) + " " + this.defaultCurrency.toString();
     }
     /**
@@ -76,12 +87,15 @@ public class Product extends BaseModel {
     public void setPrice(float price, String currency) {
         this.defaultPrice = price;
         this.defaultCurrency = Currency.getInstance(currency);
+        logger.trace("Set products price {} {} to {} {}", this.defaultPrice, this.defaultPrice, price, currency);
+
     }
     /**
      * Gets the product category of the product
      * @return the product category of the product
      */
     public ProductCategory getProductCategory() {
+        logger.trace("Product {} product category is {}", this.name, this.productCategory.toString());
         return productCategory;
     }
     /**
@@ -91,12 +105,15 @@ public class Product extends BaseModel {
     public void setProductCategory(ProductCategory productCategory) {
         this.productCategory = productCategory;
         this.productCategory.addProduct(this);
+        logger.trace("Set product category {} to {}", this.productCategory.getName(), productCategory.getName());
+
     }
     /**
      * Gets the supplier of the product
      * @return the supplier of the product
      */
     public Supplier getSupplier() {
+        logger.trace("Product {} supplier is {}", this.name, this.supplier.toString());
         return supplier;
     }
     /**
@@ -106,6 +123,8 @@ public class Product extends BaseModel {
     public void setSupplier(Supplier supplier) {
         this.supplier = supplier;
         this.supplier.addProduct(this);
+        logger.trace("Set supplier {} to {}", this.supplier.getName(), supplier.getName());
+
     }
     /**
      * Sets a custom toString representation of the class
