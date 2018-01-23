@@ -139,7 +139,7 @@ public class CartDaoJDBC implements CartDao {
     @Override
     public void clearCart() {
         try (ConnectionHandler conn = new ConnectionHandler()) {
-            conn.execute("DELETE FROM cart");
+            conn.execute("DELETE FROM cart CASCADE");
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -178,6 +178,10 @@ public class CartDaoJDBC implements CartDao {
             }
             logger.warn("Problem near; creating arg with stringbuilder: {}", arg.toString());
             List<TypeCaster> args = new ArrayList<>();
+            if (args.size() == 0){
+                clearCart();
+                return;
+            }
             args.add(new TypeCaster(arg.toString().substring(0,arg.length()-1),false));
             logger.debug("Update cart product_list with: {}", arg.toString().substring(0,arg.length()-1));
             conn.execute("UPDATE cart SET product_list = ?",args);

@@ -5,6 +5,7 @@ import com.codecool.shop.controller.ProductController;
 import com.codecool.shop.dao.*;
 import com.codecool.shop.dao.implementation.*;
 import com.codecool.shop.model.*;
+import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
@@ -12,7 +13,6 @@ import spark.template.thymeleaf.ThymeleafTemplateEngine;
 public class Main {
 
     public static void main(String[] args) throws IllegalArgumentException{
-
         // default server settings
         exception(Exception.class, (e, req, res) -> e.printStackTrace());
         staticFileLocation("/public");
@@ -73,11 +73,17 @@ public class Main {
 
         post("/login", (Request req, Response res) -> {
             //check login here
-            return new ThymeleafTemplateEngine().render( ProductController.renderProducts(req, res) );
+            if (ProductController.checkLogin(req, res)) {
+                req.session().attribute("user", "user");
+                return new ThymeleafTemplateEngine().render(ProductController.renderProducts(req, res));
+            } else {
+                return new ThymeleafTemplateEngine().render(ProductController.renderProducts(req, res));
+            }
         });
 
         post("/sign-up", (Request req, Response res) -> {
             //save user data here
+            ProductController.saveUser(req, res);
             return new ThymeleafTemplateEngine().render( ProductController.renderProducts(req, res) );
         });
 

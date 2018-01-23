@@ -21,7 +21,7 @@ DROP SEQUENCE IF EXISTS public.user_data_id_seq;
 CREATE TABLE user_data (
     id serial NOT NULL,
     name text, 
-    email text, 
+    email text,
     phone_number text,
     billing_address text,
     billing_city text, 
@@ -30,7 +30,8 @@ CREATE TABLE user_data (
     shipping_address text, 
     shipping_city text,
     shipping_zipcode text,
-    shipping_country text
+    shipping_country text,
+    password char(60)
 );
 
 DROP TABLE IF EXISTS public.orders;
@@ -96,7 +97,7 @@ ALTER TABLE ONLY orders
     ADD CONSTRAINT fk_user_data_id FOREIGN KEY (user_data_id) REFERENCES user_data(id);
 
 ALTER TABLE ONLY orders
-    ADD CONSTRAINT fk_cart_id FOREIGN KEY (cart_id) REFERENCES cart(id);
+    ADD CONSTRAINT fk_cart_id FOREIGN KEY (cart_id) REFERENCES cart(id) ;
 
 
 INSERT INTO supplier VALUES(1, 'Amazon', 'Digital content and services');
@@ -115,7 +116,7 @@ INSERT INTO product VALUES (2, 'Lenovo IdeaPad Miix 700', 479, 'USD', 'Keyboard 
 INSERT INTO product VALUES (3, 'Amazon Fire HD 8', 89, 'USD', 'Amazons latest Fire HD 8 tablet is a great value for media consumption.', 2, 1);
 SELECT pg_catalog.setval('product_id_seq', 3, true);
 
-INSERT INTO user_data VALUES(1, 'Gipsz Jakab', 'testemail@gmail.com', '303377027', 'Kőbányai utca', 'Budakalász', '2011', 'Hungary', 'Déryné utca', 'Gödöllő', '2100', 'Hungary');
+INSERT INTO user_data VALUES(1, 'Gipsz Jakab', 'testemail@gmail.com', '303377027', 'Kőbányai utca', 'Budakalász', '2011', 'Hungary', 'Déryné utca', 'Gödöllő', '2100', 'Hungary', '123');
 SELECT pg_catalog.setval('user_data_id_seq', 1, true);
 
 INSERT INTO cart VALUES(1, '1,1,2,3');

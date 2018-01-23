@@ -70,6 +70,52 @@ public class UserJDBC {
         logger.debug("User found in memory and returned");
         return user;
     }
+
+    public static void saveUserData(String name ,String email, String password) {
+        if (emailCheck(email)) {
+            try (ConnectionHandler conn = new ConnectionHandler()) {
+                List<TypeCaster> args = new ArrayList<>();
+                args.add(new TypeCaster(name, false));
+                args.add(new TypeCaster(email, false));
+                args.add(new TypeCaster(password, false));
+                conn.execute("INSERT INTO user_data (id,name,email,password) VALUES(DEFAULT, ?, ?, ?)", args);
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+
+    public static boolean emailCheck(String email) {
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            List<TypeCaster> args = new ArrayList<>();
+            args.add(new TypeCaster(email, false));
+            ResultSet resultSet = conn.process("SELECT * from user_data where email=?", args);
+            return resultSet != null;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public static String getPassByEmail(String email) {
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            List<TypeCaster> args = new ArrayList<>();
+            args.add(new TypeCaster(email, false));
+            ResultSet resultSet = conn.process("SELECT password FROM user_data WHERE email=?", args);
+            if (resultSet == null) {
+                throw new IllegalArgumentException();
+            }
+            String result = "";
+            while (resultSet.next()) {
+                result =  resultSet.getString("password");
+            }
+            return result;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 }
 
 
