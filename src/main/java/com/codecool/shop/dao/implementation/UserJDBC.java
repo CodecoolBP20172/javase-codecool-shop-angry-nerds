@@ -91,7 +91,11 @@ public class UserJDBC {
             List<TypeCaster> args = new ArrayList<>();
             args.add(new TypeCaster(email, false));
             ResultSet resultSet = conn.process("SELECT * from user_data where email=?", args);
-            return resultSet != null;
+            String resultEmail = null;
+            while (resultSet.next()){
+                resultEmail = resultSet.getString("email");
+            }
+            return resultEmail == null;
         } catch (SQLException e) {
             e.printStackTrace();
         }

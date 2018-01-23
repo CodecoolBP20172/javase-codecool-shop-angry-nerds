@@ -31,7 +31,7 @@ public class Main {
            return new ThymeleafTemplateEngine().render( ProductController.renderProducts(req, res) );
         });
         get("listby/:supOrCat/:id", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req.params(":supOrCat"), req.params(":id")) );
+            return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req ,req.params(":supOrCat"), req.params(":id")) );
         });
         get("cart/:id", (Request req, Response res) -> {
             return new ThymeleafTemplateEngine().render( ProductController.addProduct(req.params(":id")) );
@@ -74,7 +74,8 @@ public class Main {
         post("/login", (Request req, Response res) -> {
             //check login here
             if (ProductController.checkLogin(req, res)) {
-                req.session().attribute("user", "user");
+                req.session(true);
+                req.session().attribute("email",req.queryParams("email"));
                 return new ThymeleafTemplateEngine().render(ProductController.renderProducts(req, res));
             } else {
                 return new ThymeleafTemplateEngine().render(ProductController.renderProducts(req, res));

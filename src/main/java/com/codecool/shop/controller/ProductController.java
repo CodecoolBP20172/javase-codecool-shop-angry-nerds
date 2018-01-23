@@ -15,6 +15,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.Session;
 import sun.security.util.Password;
 
 import static com.codecool.shop.dao.implementation.UserJDBC.getPassByEmail;
@@ -50,6 +51,7 @@ public class ProductController {
     public static ModelAndView renderProducts(Request req, Response res) {
         logger.info("Rendering index page with all the products...");
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("title", "All products");
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
@@ -67,10 +69,11 @@ public class ProductController {
      * suppliers,products filtered by the params, cart size and the index html form.
      */
 
-    public static ModelAndView renderProductsBy(String supOrCat, String id) {
+    public static ModelAndView renderProductsBy(Request req ,String supOrCat, String id) {
         logger.info("Sorting index page by: {}", supOrCat);
         logger.debug("Args: supOrCat: {}, id: {}",supOrCat,id);
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
         params.put("cartSize", cartData.getCount());
