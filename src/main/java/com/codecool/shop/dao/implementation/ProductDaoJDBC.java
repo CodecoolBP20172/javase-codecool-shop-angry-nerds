@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 /**
- * This is a simple product data access object which serves the Product class and helpes it to
+ * This is a simple product data access object which serves the Product class and helps it to
  * communicate with the database.
  * <p>
  * It implements the ProductDao interface.

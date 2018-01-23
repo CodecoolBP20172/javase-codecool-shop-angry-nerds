@@ -39,11 +39,11 @@ public class Email {
      * it throws a RuntimeException.
      * @param order the parameter is used to get information about the order which is then composed to the e-mail
      */
-    public static void sendEmail(Order order) {
+    public static void sendEmail(Order order, User user) {
 
         final String username = "codecoolshop.angrynerds@gmail.com";
         final String password = "Honolulu27";
-        Map userData = order.getUserData();
+        Map userData = user.getUserData();
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");

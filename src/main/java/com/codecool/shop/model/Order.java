@@ -23,19 +23,19 @@ import java.util.Map;
 public class Order {
     private int id;
     private Map<Product, Integer> order = new HashMap<Product, Integer>();
-    private LinkedHashMap userData = new LinkedHashMap();
+    private User user;
 
     private static final Logger logger = LoggerFactory.getLogger(Order.class);
 
     /**
      * The constructor of the Order class
      * @param order content of a cart
-     * @param userData the department of the product category
+     * @param user the department of the product category
      */
-    public Order(Map<Product, Integer> order, LinkedHashMap userData) {
+    public Order(Map<Product, Integer> order, User user) {
         this.order = order;
-        this.userData = userData;
-        logger.trace("Created instance of class Order with order {} and userData {}", order, userData);
+        this.user = user;
+        logger.trace("Created instance of class Order with order {} and username {}", order, user);
 
     }
 
@@ -44,8 +44,8 @@ public class Order {
      * @return the data of the user linked to this order
      */
     public HashMap getUserData() {
-        logger.trace("User's data of this order are {}", userData );
-        return userData;
+        logger.trace("User's data of this order are {}", user.getUserData() );
+        return user.getUserData();
     }
 
     /**
@@ -84,7 +84,7 @@ public class Order {
         return "Order{" +
                 "id=" + id +
                 ", order=" + order +
-                ", userData=" + userData +
+                ", userData=" + user.getUserData() +
                 '}';
     }
 

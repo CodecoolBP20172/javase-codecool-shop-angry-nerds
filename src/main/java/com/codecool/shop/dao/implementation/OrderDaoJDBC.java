@@ -1,6 +1,7 @@
 package com.codecool.shop.dao.implementation;
 
 
+import com.codecool.shop.model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -88,7 +89,7 @@ public class OrderDaoJDBC implements OrderDao{
                 int id = rs.getInt("id");
                 int userDataId = rs.getInt("user_data_id");
                 int cartId = rs.getInt("cart_id");
-                orders.add(new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId).getUserData())); //CartDao needs a get
+                orders.add(new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId))); //CartDao needs a get
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -116,7 +117,7 @@ public class OrderDaoJDBC implements OrderDao{
             int id = rs.getInt("id");
             int userDataId = rs.getInt("user_data_id");
             int cartId = rs.getInt("cart_id");
-            lastOrder = new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId).getUserData());
+            lastOrder = new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId));
             lastOrder.setId(id);
         } catch (SQLException e){
             e.printStackTrace();

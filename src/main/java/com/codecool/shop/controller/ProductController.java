@@ -16,6 +16,8 @@ import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.codecool.shop.dao.implementation.UserJDBC.getUser;
+
 /**
  *This java class is the bridge between the server and the JDBC classes.
  * <p>
@@ -33,6 +35,7 @@ public class ProductController {
     private static SupplierDao supplierDataStore = SupplierDaoJDBC.getInstance();
     private static CartDao cartData = CartDaoJDBC.getInstance();
     private static OrderDao orderData = OrderDaoJDBC.getInstance();
+    private static UserJDBC userDataJDBC = UserJDBC.getInstance();
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
 
@@ -195,7 +198,9 @@ public class ProductController {
             userData.put(data, req.queryParams(data));
             json.put(data, req.queryParams(data));
         }
-        Order order = new Order(cartData.getAll(), userData);
+        User user = new User(userData);
+        userDataJDBC.saveUser(user);
+        Order order = new Order(cartData.getAll(), user);
         logger.debug("New order: {}", order);
         orderData.add(order);
         json.put("Ordered Items", cartData.getAll());
@@ -228,13 +233,13 @@ public class ProductController {
         logger.error("CLEAR CART IS NOT WORKING ATM");
         cartData.clearCart();
         params.put("message", "Payment successful!");
-        params.put("userData", orderData.getLast().getUserData());
+        params.put("userData", getUser(userDataJDBC.getCurrentUser()).getUserData());
         params.put("orderData", orderData.getLast().getOrder());
         params.put("orderId", orderData.getLast().getId());
         params.put("sumPrice", sumPrice);
         logger.info("Sending email with order...");
         logger.debug("Sending email with order: {}", orderData.getLast());
-        Email.sendEmail(orderData.getLast());
+        Email.sendEmail(orderData.getLast(), UserJDBC.getUser(userDataJDBC.getCurrentUser()));
         return new ModelAndView(params, "confirmation");
     }
 
