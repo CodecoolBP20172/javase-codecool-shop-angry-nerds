@@ -71,7 +71,7 @@ public class UserJDBC {
         return user;
     }
 
-    public static void saveUserData(String name ,String email, String password) {
+    public static boolean saveUserData(String name ,String email, String password) {
         if (emailCheck(email)) {
             try (ConnectionHandler conn = new ConnectionHandler()) {
                 List<TypeCaster> args = new ArrayList<>();
@@ -79,11 +79,12 @@ public class UserJDBC {
                 args.add(new TypeCaster(email, false));
                 args.add(new TypeCaster(password, false));
                 conn.execute("INSERT INTO user_data (id,name,email,password) VALUES(DEFAULT, ?, ?, ?)", args);
+                return true;
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
-
+        return false;
     }
 
     public static boolean emailCheck(String email) {

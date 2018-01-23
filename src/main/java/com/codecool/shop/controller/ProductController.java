@@ -285,12 +285,13 @@ public class ProductController {
         return new ModelAndView(params, "signUp");
     }
 
-    public static void saveUser(Request req, Response res) {
+    public static boolean saveUser(Request req, Response res) {
         String password = com.codecool.shop.Password.hashPassword(req.queryParams("password"));
-        saveUserData(req.queryParams("name"), req.queryParams("email"), password);
+        return saveUserData(req.queryParams("name"), req.queryParams("email"), password);
     }
 
     public static boolean checkLogin(Request req, Response res) {
+        if (getPassByEmail(req.queryParams("email")).equals("")) return false;
         return com.codecool.shop.Password.checkPassword(req.queryParams("password"), getPassByEmail(req.queryParams("email")));
     }
 

@@ -20,7 +20,6 @@ public class Main {
 
         // populate some data for the memory storage
         populateData();
-
         // Always start with more specific routes
         get("/hello", (req, res) -> "Hello World");
 
@@ -76,17 +75,31 @@ public class Main {
             if (ProductController.checkLogin(req, res)) {
                 req.session(true);
                 req.session().attribute("email",req.queryParams("email"));
-                return new ThymeleafTemplateEngine().render(ProductController.renderProducts(req, res));
+                res.redirect("/");
             } else {
-                return new ThymeleafTemplateEngine().render(ProductController.renderProducts(req, res));
+                halt(401);
+                res.redirect("/");
             }
+            return null;
         });
 
         post("/sign-up", (Request req, Response res) -> {
             //save user data here
-            ProductController.saveUser(req, res);
-            return new ThymeleafTemplateEngine().render( ProductController.renderProducts(req, res) );
+            if (ProductController.saveUser(req, res)){
+                req.session(true);
+                req.session().attribute("email",req.queryParams("email"));
+                res.redirect("/");
+            } else {
+                res.redirect("/sign-up");
+            }
+            return null;
         });
+
+        get("/logout", (Request req, Response res) -> {
+            req.session().removeAttribute("email");
+            res.redirect("/");
+            return null;
+                });
 
         // Add this line to your project to enable the debug screen
         enableDebugScreen();
