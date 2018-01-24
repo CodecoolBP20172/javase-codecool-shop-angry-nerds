@@ -15,6 +15,10 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.security.util.Password;
+
+import static com.codecool.shop.dao.implementation.UserJDBC.getPassByEmail;
+import static com.codecool.shop.dao.implementation.UserJDBC.saveUserData;
 
 import static com.codecool.shop.dao.implementation.UserJDBC.getUser;
 
@@ -172,7 +176,7 @@ public class ProductController {
                 }
             }
         }
-        if (isError == false) {
+        if (!isError) {
             logger.info("Currency check passed, no anomaly detected.");
         }
         params.put("isError", isError);
@@ -269,6 +273,27 @@ public class ProductController {
             cartData.setQuantity(id, quantity);
         }
 
+    }
+
+    public static ModelAndView login(Request req, Response res){
+        Map params = new HashMap();
+        params.put("title", "Login");
+        return new ModelAndView(params, "login");
+    }
+
+    public static ModelAndView signUp(Request req, Response res){
+        Map params = new HashMap();
+        params.put("title", "Sign Up");
+        return new ModelAndView(params, "signUp");
+    }
+
+    public static void saveUser(Request req, Response res) {
+        String password = com.codecool.shop.Password.hashPassword(req.queryParams("password"));
+        saveUserData(req.queryParams("name"), req.queryParams("email"), password);
+    }
+
+    public static boolean checkLogin(Request req, Response res) {
+        return com.codecool.shop.Password.checkPassword(req.queryParams("password"), getPassByEmail(req.queryParams("email")));
     }
 
 }
