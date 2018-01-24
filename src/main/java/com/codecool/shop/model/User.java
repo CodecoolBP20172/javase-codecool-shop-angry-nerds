@@ -27,7 +27,7 @@ public class User{
      * The constructor of the User class
      * @param userData gets a Map as parameter with all the user data
      */
-    public User(LinkedHashMap userData){
+    public User(LinkedHashMap<String, String> userData){
 
         this.userData = userData;
 

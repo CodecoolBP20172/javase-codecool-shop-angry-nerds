@@ -54,27 +54,14 @@ public class CartDaoJDBC implements CartDao {
      */
     @Override
     public void add(Product product) {
-        logger.warn("Not working with multiple users");
-        logger.debug("Starting method with arg: {}", product);
-        if (product == null) {
-            logger.warn("Product is null");
-            throw new IllegalArgumentException();
-        }
-        try (ConnectionHandler conn = new ConnectionHandler()) {
-            logger.info("Connected to database");
-            ResultSet resultSet= conn.process("SELECT * FROM cart");
-            logger.debug("resultSet of select * from cart: {}", resultSet);
-            String productList = null;
-            while (resultSet.next()) {
-                productList = resultSet.getString(2);
-            }
-            logger.debug("productList from resultSet col 2: {}", productList);
-            List<TypeCaster> args = new ArrayList<>();
-            args.add(new TypeCaster(productList + "," + product.getId(),false));
-            logger.debug("Update cart product_list with: {},{}", productList,product.getId());
-            conn.execute("UPDATE cart SET product_list = ?",args);
+        try (ConnectionHandler con = new ConnectionHandler()){
+            List<TypeCaster> list = new ArrayList<>();
+            list.add(new TypeCaster(String.valueOf(product.getId()), true));
+            list.add(new TypeCaster(String.valueOf(OrderDaoJDBC.getCurrentOrderId()), true));
+            con.process("INSERT INTO cart VALUES (DEFAULT, ?, ?);", list);
+            logger.debug("Product added to database");
         } catch (SQLException e) {
-            logger.error("Database connection error");
+            logger.warn("Connection to database failed while adding product to database");
             e.printStackTrace();
         }
     }

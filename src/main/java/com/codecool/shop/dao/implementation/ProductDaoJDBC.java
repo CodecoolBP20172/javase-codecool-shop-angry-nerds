@@ -58,7 +58,7 @@ public class ProductDaoJDBC implements ProductDao {
             list.add(new TypeCaster(product.getDescription(), false));
             list.add(new TypeCaster(Integer.toString(product.getProductCategory().getId()), true));
             list.add(new TypeCaster(Integer.toString(product.getSupplier().getId()), true));
-            con.process("INSERT INTO product VALUES (DEFAULT, ?, ?, ?,  ?, ?, ?);", list);
+            con.process("INSERT INTO product VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);", list);
             logger.debug("Product added to database");
         } catch (SQLException e) {
             logger.warn("Connection to database failed while adding product to database");

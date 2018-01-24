@@ -7,15 +7,13 @@ import com.codecool.shop.model.*;
 import spark.Request;
 import spark.Response;
 import spark.ModelAndView;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import sun.security.util.Password;
 
 import static com.codecool.shop.dao.implementation.UserJDBC.getPassByEmail;
 import static com.codecool.shop.dao.implementation.UserJDBC.saveUserData;
@@ -237,8 +235,8 @@ public class ProductController {
         logger.error("CLEAR CART IS NOT WORKING ATM");
         cartData.clearCart();
         params.put("message", "Payment successful!");
-        params.put("userData", getUser(userDataJDBC.getCurrentUser()).getUserData());
-        params.put("orderData", orderData.getLast().getOrder());
+        params.put("userData", userDataJDBC.getUser(userDataJDBC.getCurrentUser()).getUserData());
+        params.put("orderData", orderData.getLast().getProductList());
         params.put("orderId", orderData.getLast().getId());
         params.put("sumPrice", sumPrice);
         logger.info("Sending email with order...");
@@ -289,11 +287,19 @@ public class ProductController {
 
     public static void saveUser(Request req, Response res) {
         String password = com.codecool.shop.Password.hashPassword(req.queryParams("password"));
-        saveUserData(req.queryParams("name"), req.queryParams("email"), password);
+        userDataJDBC.saveUserData(req.queryParams("name"), req.queryParams("email"), password);
+        LinkedHashMap<String, String> userData = new LinkedHashMap<>();
+        userData.put("Name", req.queryParams("name"));
+        userData.put("E-mail", req.queryParams("email"));
+        User user = new User(userData);
+        Order order = new Order(user);
+        orderData.add(order);
+        UserJDBC.setCurrentUserId(userDataJDBC.getUserId(userData.get("E-mail")));
+        OrderDaoJDBC.setCurrentOrderId(orderData.getLast().getId());
     }
 
     public static boolean checkLogin(Request req, Response res) {
-        return com.codecool.shop.Password.checkPassword(req.queryParams("password"), getPassByEmail(req.queryParams("email")));
+        return com.codecool.shop.Password.checkPassword(req.queryParams("password"), userDataJDBC.getPassByEmail(req.queryParams("email")));
     }
 
 }

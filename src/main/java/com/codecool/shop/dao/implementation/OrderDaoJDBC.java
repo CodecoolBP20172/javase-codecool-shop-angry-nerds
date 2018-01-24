@@ -1,18 +1,21 @@
 package com.codecool.shop.dao.implementation;
 
 
-import com.codecool.shop.model.User;
+import com.codecool.shop.dao.ProductCategoryDao;
+import com.codecool.shop.dao.SupplierDao;
+import com.codecool.shop.database.TypeCaster;
+import com.codecool.shop.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.codecool.shop.dao.OrderDao;
 import com.codecool.shop.database.ConnectionHandler;
-import com.codecool.shop.model.Order;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -29,7 +32,10 @@ import java.util.List;
 public class OrderDaoJDBC implements OrderDao{
 
     private static OrderDaoJDBC instance = null;
+    private static ProductCategoryDao productCategoryDataStore = ProductCategoryDaoJDBC.getInstance();
+    private static SupplierDao supplierDataStore = SupplierDaoJDBC.getInstance();
     private static final Logger logger = LoggerFactory.getLogger(OrderDaoJDBC.class);
+    private static int CurrentOrderId;
 
     private OrderDaoJDBC() {
     }
@@ -48,6 +54,14 @@ public class OrderDaoJDBC implements OrderDao{
         return instance;
     }
 
+    public static int getCurrentOrderId() {
+        return CurrentOrderId;
+    }
+
+    public static void setCurrentOrderId(int currentOrderId) {
+        CurrentOrderId = currentOrderId;
+    }
+
     /**
      * This method adds an Order to the database. It has one parameter, which is an
      * Order that gets inserted into the database. If the argument is null it throws
@@ -61,9 +75,11 @@ public class OrderDaoJDBC implements OrderDao{
             logger.debug("OrderDaoJDBC add method received invalid argument");
             throw new IllegalArgumentException();
         }
-        String query = "INSERT INTO orders (user_data_id, cart_id) VALUES (1, 1);";
+        String query = "INSERT INTO orders (user_data_id, status) VALUES (?, 'In cart');";
         try(ConnectionHandler handler = new ConnectionHandler()) {
-            handler.execute(query);
+            ArrayList<TypeCaster> queryList = new ArrayList<>();
+            queryList.add(new TypeCaster(String.valueOf(UserJDBC.getCurrentUserId()), true));
+            handler.execute(query, queryList);
             logger.debug("Order added successfully to database");
         } catch (SQLException e){
             e.printStackTrace();
@@ -88,7 +104,7 @@ public class OrderDaoJDBC implements OrderDao{
             while (rs.next()) {
                 int id = rs.getInt("id");
                 int userDataId = rs.getInt("user_data_id");
-                int cartId = rs.getInt("cart_id");
+                String status = rs.getString("status");
                 orders.add(new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId))); //CartDao needs a get
             }
         } catch (SQLException e) {
@@ -125,5 +141,33 @@ public class OrderDaoJDBC implements OrderDao{
         }
         logger.debug("Returning the last order in a list");
         return lastOrder;
+    }
+
+    public List getProductList(int orderId) {
+        List<Product> productList = new ArrayList <>();
+        String query = "SELECT product.id, product.name, product.default_price, product.default_currency, "
+                     + "product.description, product.product_category_id, product.supplier_id "
+                     + "FROM cart "
+                     + "LEFT JOIN product ON cart.product_id = product.id "
+                     + "WHERE cart.order_id = ?;";
+        try (ConnectionHandler handler = new ConnectionHandler()) {
+            ArrayList<TypeCaster> queryList = new ArrayList<>();
+            queryList.add(new TypeCaster(String.valueOf(orderId), true));
+            ResultSet rs = handler.process(query, queryList);
+            while (rs.next()) {
+                String name = rs.getString("product.name");
+                float defaultPrice = rs.getFloat("product.default_price");
+                String defaultCurrency = rs.getString("product.default_currency");
+                String description = rs.getString("product.description");
+                ProductCategory productCategory = productCategoryDataStore.find(rs.getInt("product.product_category_id"));
+                Supplier supplier = supplierDataStore.find(rs.getInt("product.supplier_id"));
+                productList.add(new Product(name, defaultPrice, defaultCurrency, description, productCategory, supplier));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            logger.warn("Connection to database failed while trying get all order from database");
+        }
+        logger.debug("Returning all orders in a list");
+        return productList;
     }
 }

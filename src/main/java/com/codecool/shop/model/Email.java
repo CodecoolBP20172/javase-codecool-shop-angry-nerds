@@ -83,7 +83,7 @@ public class Email {
                     + "\n Shipping Zipcode: " + userData.get("Shipping Zipcode")
                     + "\n Shipping Country: " + userData.get("Shipping Country")
                     + "\n\n Ordered items: \n"
-                    + convertOrder(order.getOrder())
+                    + convertOrder(order.getProductList())
                     + "\n\n We wish You merry christmas and hope You will shop with us next time!"
                     + "\n Best regards,"
                     + "\n\n Your CodeCool Shop");
