@@ -1,48 +1,12 @@
 <!doctype html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="utf-8" />
-    <meta name="author" content="Codecool" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>Codecool Shop</title>
-
-    <!-- Latest compiled and minified Jquery -->
-    <script src="https://code.jquery.com/jquery-3.1.1.min.js"
-            integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
-
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
-          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
-
-    <!-- Optional theme -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css"
-          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous" />
-
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
-            crossorigin="anonymous"></script>
-
-    <link rel="stylesheet" type="text/css" href="/css/custom.css" />
+    <div th:replace="head :: copy"></div>
 </head>
 
 <body>
-<nav class="navbar navbar-default">
-    <div class="container-fluid">
-        <ul class="nav navbar-nav navbar-left">
-            <li><a class="btn btn-success" href="/">Main Page</a></li>
-        </ul>
-        <ul class="nav navbar-nav navbar-right">
-            <li><a class="btn btn-success" href="/login">Login</a></li>
-            <li><a class="btn btn-success" href="/sign-up">Sign Up</a></li>
-            <li><a href="/showcart/" th:text="${cartSize}"></a></li>
-            <li><a class="navbar-brand" href="/showcart/">
-                <img src="/img/cart.png" width="32" height="32"></img>
-            </a></li>
-        </ul>
-    </div>
-</nav>
+<div th:replace="navbar :: copy"></div>
+
 <div class="jumbotron text-center">
     <h1>Codecool Shop</h1>
 </div>
@@ -54,7 +18,7 @@
 
     <div class="well well-sm" th:switch="${title}">
         <div th:case="'Checkout'">
-        <form method="POST" action="/payment">
+        <form method="POST" action="/protected/payment">
             <h3>Name:  </h3><input type="text" name="Name" value=""/><br/>
             <h3>Email: </h3><input type="text" name="E-mail" value=""/><br/>
             <h3>Phone Number: </h3><input type="number" name="Phone Number" value=""/><br/>
@@ -79,7 +43,7 @@
         <div th:case="'Payment'">
             <div th:switch="${method}">
                 <div th:case="'creditcard'">
-                    <form method="POST" action="/confirm">
+                    <form method="POST" action="/protected/confirm">
                         <h3>Card number:  </h3><input type="text" name="name" value=""/><br/>
                         <h3>Card holder: </h3><input type="text" name="email" value=""/><br/>
                         <h3>Expiry date: </h3><input type="number" name="expirydate" value=""/><br/>
@@ -88,7 +52,7 @@
                     </form>
                 </div>
                 <div th:case="'paypal'">
-                    <form method="POST" action="/confirm">
+                    <form method="POST" action="/protected/confirm">
                         <h3>Username:  </h3><input type="text" name="username" value=""/><br/>
                         <h3>Password: </h3><input type="text" name="password" value=""/><br/>
                         <input class="btn btn-success" type="submit" value="Pay"/>

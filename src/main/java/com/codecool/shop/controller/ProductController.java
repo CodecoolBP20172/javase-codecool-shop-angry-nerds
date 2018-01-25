@@ -89,7 +89,9 @@ public class ProductController {
             params.put("products", productDataStore.getBy(productCategory));
         } else {
             logger.error("SupOrCat is invalid: {} ", supOrCat);
-            return new ModelAndView(params, "404");
+            params.put("error", "404");
+            params.put("message", "Page not found");
+            return new ModelAndView(params, "error");
         }
         logger.debug("Rendering index page with params: {} ", params);
         return new ModelAndView(params, "product/index");
@@ -101,9 +103,10 @@ public class ProductController {
      * @return returns the title param and forms html form.
      */
 
-    public static ModelAndView forms(String title) {
+    public static ModelAndView forms(String title, Request req) {
         logger.info("Rendering forms page with title: {}", title);
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("title", title);
         logger.debug("Rendering forms page with params: {}", params);
         return new ModelAndView(params, "forms");
@@ -115,9 +118,10 @@ public class ProductController {
      * @param method holds information about desired payment method(credit card / paypal)
      * @return title,method and forms html form
      */
-    public static ModelAndView forms(String title, String method) {
+    public static ModelAndView forms(String title, String method, Request req) {
         logger.info("Rendering forms page with title: {}", title);
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("title", title);
         params.put("method", method);
         logger.debug("Rendering forms page with params: {}", params);
@@ -151,13 +155,14 @@ public class ProductController {
      * this value will show), sum of the price, currency and the cart html form.
      */
 
-    public static ModelAndView renderCart() {
+    public static ModelAndView renderCart(Request req) {
         logger.info("Rendering cart...");
         int sumPrice = 0;
         String firstCurrency = null;
         String nextCurrency = null;
         boolean isError = false;
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("title", "Your cart");
         params.put("cartProducts", cartData.getAll());
         params.put("cartSize", cartData.getCount());
@@ -226,7 +231,7 @@ public class ProductController {
      * @return Returns order, user data, the order ID, sum of the price,
      * a message if the process was successful and the confirmation html form.
      */
-    public static ModelAndView confirmation() {
+    public static ModelAndView confirmation(Request req) {
         int sumPrice = 0;
         Map params = new HashMap();
         for (Map.Entry<Product, Integer> entry : cartData.getAll().entrySet()) {
@@ -234,6 +239,7 @@ public class ProductController {
         }
         logger.error("CLEAR CART IS NOT WORKING ATM");
         cartData.clearCart();
+        params.put("session" ,req.session().attribute("email"));
         params.put("message", "Payment successful!");
         params.put("userData", orderData.getLast().getUserData());
         params.put("orderData", orderData.getLast().getOrder());

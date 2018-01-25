@@ -1,7 +1,13 @@
 <!doctype html>
-<html lang="en">
-<head>
-    <title>404</title>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<div th:fragment="copy">
+    <meta charset="utf-8" />
+    <meta name="author" content="Codecool" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Codecool Shop</title>
 
     <!-- Latest compiled and minified Jquery -->
     <script src="https://code.jquery.com/jquery-3.1.1.min.js"
@@ -21,19 +27,7 @@
             crossorigin="anonymous"></script>
 
     <link rel="stylesheet" type="text/css" href="/css/custom.css" />
-</head>
-<body>
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <ul class="nav navbar-nav navbar-left">
-                <li><a class="btn btn-success" href="/">Main Page</a></li>
-            </ul>
-            <ul class="nav navbar-nav navbar-right">
-                <li><a class="btn btn-success" href="/login">Login</a></li>
-                <li><a class="btn btn-success" href="/sign-up">Sign Up</a></li>
-            </ul>
-        </div>
-    </nav>
-    <h1>404 - Page not found</h1>
+</div>
+
 </body>
 </html>
