@@ -1,6 +1,5 @@
 package com.codecool.shop.model;
 
-import com.sun.tools.corba.se.idl.constExpr.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
