@@ -247,8 +247,6 @@ public class ProductController {
         for (Map.Entry<Product, Integer> entry : cartData.find(getOrderIdFromSession(req)).getCart().entrySet()) {
             sumPrice += entry.getKey().getDefaultPrice() * entry.getValue();
         }
-        logger.error("CLEAR CART IS NOT WORKING ATM");
-        cartData.clearCart();
         params.put("session" ,req.session().attribute("email"));
         params.put("message", "Payment successful!");
         params.put("userData", userDataJDBC.getUser(getUserIdFromSession(req)).getUserData());
@@ -303,12 +301,16 @@ public class ProductController {
 
     public static boolean saveUser(Request req, Response res) {
         String password = com.codecool.shop.Password.hashPassword(req.queryParams("password"));
-        return saveUserData(req.queryParams("name"), req.queryParams("email"), password);
+        return userDataJDBC.saveUserData(req.queryParams("name"), req.queryParams("email"), password);
     }
 
     public static boolean checkLogin(Request req, Response res) {
-        if (getPassByEmail(req.queryParams("email")).equals("")) return false;
-        return com.codecool.shop.Password.checkPassword(req.queryParams("password"), getPassByEmail(req.queryParams("email")));
+        if (userDataJDBC.getPassByEmail(req.queryParams("email")).equals("")) return false;
+        return com.codecool.shop.Password.checkPassword(req.queryParams("password"), userDataJDBC.getPassByEmail(req.queryParams("email")));
+    }
+
+    public static Integer getUserIdByEmail(String email) {
+        return userDataJDBC.getUserId(email);
     }
 
 }

@@ -41,7 +41,7 @@ public class Main {
             return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req ,req.params(":supOrCat"), req.params(":id")) );
         });
         get("/protected/cart/:id", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render( ProductController.addProduct(req.params(":id")) );
+            return new ThymeleafTemplateEngine().render( ProductController.addProduct(req,req.params(":id")) );
         });
         get("/protected/showcart", (Request req, Response res) -> {
             return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
@@ -51,7 +51,7 @@ public class Main {
             return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
         get("/protected/changeQuantity/:id", (Request req, Response res) -> {
-            ProductController.changeQuantity(Integer.parseInt(req.params(":id")),Integer.parseInt(req.queryParams("quantity")));
+            ProductController.changeQuantity(req,Integer.parseInt(req.params(":id")),Integer.parseInt(req.queryParams("quantity")));
             return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
 
@@ -83,6 +83,8 @@ public class Main {
             if (ProductController.checkLogin(req, res)) {
                 req.session(true);
                 req.session().attribute("email",req.queryParams("email"));
+                int userId = ProductController.getUserIdByEmail(req.queryParams("email"));
+                req.session().attribute("userId", String.valueOf(userId));
                 res.redirect("/");
             } else {
                 halt(401, "Invalid login");

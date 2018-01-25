@@ -15,8 +15,8 @@
                 </p>
                 <p th:unless="${session} == null">
                 <li><a class="btn btn-success" href="/logout">Logout</a></li>
-                <li><a href="/showcart/" th:text="${cartSize}"></a></li>
-                <li><a class="navbar-brand" href="/showcart/">
+                <li><a href="/protected/showcart" th:text="${cartSize}"></a></li>
+                <li><a class="navbar-brand" href="/protected/showcart">
                     <img src="/img/cart.png" width="32" height="32"></img>
                 </a></li>
                 </p>
