@@ -80,9 +80,11 @@ public class UserJDBC {
             }
         } catch (SQLException e) {
             logger.warn("Connection to database failed while trying to find user in database");
+            e.printStackTrace();
         }
         if (user == null){
             logger.warn("User not found in database");
+            return user;
         }
         logger.debug("User found in memory and returned");
         return user;
@@ -108,7 +110,11 @@ public class UserJDBC {
             List<TypeCaster> args = new ArrayList<>();
             args.add(new TypeCaster(email, false));
             ResultSet resultSet = conn.process("SELECT * from user_data where email=?", args);
-            return resultSet != null;
+            String resultEmail = null;
+            while (resultSet.next()){
+                resultEmail = resultSet.getString("email");
+            }
+            return resultEmail == null;
         } catch (SQLException e) {
             e.printStackTrace();
         }

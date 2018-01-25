@@ -7,6 +7,7 @@ import com.codecool.shop.model.*;
 import spark.Request;
 import spark.Response;
 import spark.ModelAndView;
+import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -14,6 +15,8 @@ import java.util.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import spark.Session;
+import sun.security.util.Password;
 
 import static com.codecool.shop.dao.implementation.UserJDBC.getPassByEmail;
 import static com.codecool.shop.dao.implementation.UserJDBC.saveUserData;
@@ -51,6 +54,7 @@ public class ProductController {
     public static ModelAndView renderProducts(Request req, Response res) {
         logger.info("Rendering index page with all the products...");
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("title", "All products");
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
@@ -68,10 +72,11 @@ public class ProductController {
      * suppliers,products filtered by the params, cart size and the index html form.
      */
 
-    public static ModelAndView renderProductsBy(String supOrCat, String id) {
+    public static ModelAndView renderProductsBy(Request req ,String supOrCat, String id) {
         logger.info("Sorting index page by: {}", supOrCat);
         logger.debug("Args: supOrCat: {}, id: {}",supOrCat,id);
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
         params.put("cartSize", cartData.getCount());
@@ -285,7 +290,7 @@ public class ProductController {
         return new ModelAndView(params, "signUp");
     }
 
-    public static void saveUser(Request req, Response res) {
+    public static boolean saveUser(Request req, Response res) {
         String password = com.codecool.shop.Password.hashPassword(req.queryParams("password"));
         userDataJDBC.saveUserData(req.queryParams("name"), req.queryParams("email"), password);
         LinkedHashMap<String, String> userData = new LinkedHashMap<>();
@@ -296,10 +301,13 @@ public class ProductController {
         orderData.add(order);
         UserJDBC.setCurrentUserId(userDataJDBC.getUserId(userData.get("E-mail")));
         OrderDaoJDBC.setCurrentOrderId(orderData.getLast().getId());
+        return saveUserData(req.queryParams("name"), req.queryParams("email"), password);
     }
 
     public static boolean checkLogin(Request req, Response res) {
         return com.codecool.shop.Password.checkPassword(req.queryParams("password"), userDataJDBC.getPassByEmail(req.queryParams("email")));
+        if (getPassByEmail(req.queryParams("email")).equals("")) return false;
+        return com.codecool.shop.Password.checkPassword(req.queryParams("password"), getPassByEmail(req.queryParams("email")));
     }
 
 }
