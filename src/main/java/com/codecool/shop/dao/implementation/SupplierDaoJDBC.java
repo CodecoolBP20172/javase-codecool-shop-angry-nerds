@@ -132,7 +132,7 @@ public class SupplierDaoJDBC implements SupplierDao{
             logger.debug("Supplier removed from database");
         }
         catch (SQLException e) {
-            logger.warn("Connection to database failed while trying to remove supplier from database");
+            logger.warn("Connection to database failed while trying to removeByOrderId supplier from database");
         }
     }
 

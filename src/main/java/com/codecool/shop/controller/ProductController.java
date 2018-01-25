@@ -7,12 +7,11 @@ import com.codecool.shop.model.*;
 import spark.Request;
 import spark.Response;
 import spark.ModelAndView;
-import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,8 +32,17 @@ public class ProductController {
     private static SupplierDao supplierDataStore = SupplierDaoJDBC.getInstance();
     private static CartDao cartData = CartDaoJDBC.getInstance();
     private static OrderDao orderData = OrderDaoJDBC.getInstance();
+    private static UserJDBC userDataJDBC = UserJDBC.getInstance();
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
 
+
+    private static int getUserIdFromSession(Request req) {
+        return Integer.valueOf(req.session().attribute("userId"));
+    }
+
+    private static int getOrderIdFromSession(Request req) {
+        return orderData.findByUserIdAndStatus(Integer.valueOf(req.session().attribute("userId")), Status.IN_CART).getId();
+    }
 
     /**
      * Called with the root "/".
@@ -46,11 +54,20 @@ public class ProductController {
     public static ModelAndView renderProducts(Request req, Response res) {
         logger.info("Rendering index page with all the products...");
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("title", "All products");
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
         params.put("products", productDataStore.getAll());
-        params.put("cartSize", cartData.getCount());
+        if (req.session().attribute("userId") != null) {
+            System.out.println(req.session().attribute("userId").toString());
+        }
+        if (req.session().attribute("userId") == null) {
+            params.put("cartSize", 0);
+        }
+        else {
+            params.put("cartSize", cartData.getCount(getOrderIdFromSession(req)));
+        }
         logger.debug("Rendering index page with params:{}",params);
         return new ModelAndView(params, "product/index");
     }
@@ -63,13 +80,14 @@ public class ProductController {
      * suppliers,products filtered by the params, cart size and the index html form.
      */
 
-    public static ModelAndView renderProductsBy(String supOrCat, String id) {
+    public static ModelAndView renderProductsBy(Request req ,String supOrCat, String id) {
         logger.info("Sorting index page by: {}", supOrCat);
         logger.debug("Args: supOrCat: {}, id: {}",supOrCat,id);
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
-        params.put("cartSize", cartData.getCount());
+        params.put("cartSize", cartData.getCount(getUserIdFromSession(req)));
         if (supOrCat.equals("supplier")){
             Supplier supplier = supplierDataStore.find(Integer.parseInt(id));
             logger.debug("Find supplier by id {} = {}", id, supplier);
@@ -82,7 +100,9 @@ public class ProductController {
             params.put("products", productDataStore.getBy(productCategory));
         } else {
             logger.error("SupOrCat is invalid: {} ", supOrCat);
-            return new ModelAndView(params, "404");
+            params.put("error", "404");
+            params.put("message", "Page not found");
+            return new ModelAndView(params, "error");
         }
         logger.debug("Rendering index page with params: {} ", params);
         return new ModelAndView(params, "product/index");
@@ -94,9 +114,10 @@ public class ProductController {
      * @return returns the title param and forms html form.
      */
 
-    public static ModelAndView forms(String title) {
+    public static ModelAndView forms(String title, Request req) {
         logger.info("Rendering forms page with title: {}", title);
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("title", title);
         logger.debug("Rendering forms page with params: {}", params);
         return new ModelAndView(params, "forms");
@@ -108,9 +129,10 @@ public class ProductController {
      * @param method holds information about desired payment method(credit card / paypal)
      * @return title,method and forms html form
      */
-    public static ModelAndView forms(String title, String method) {
+    public static ModelAndView forms(String title, String method, Request req) {
         logger.info("Rendering forms page with title: {}", title);
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("title", title);
         params.put("method", method);
         logger.debug("Rendering forms page with params: {}", params);
@@ -122,17 +144,18 @@ public class ProductController {
      * @param id the product id which the user wished to add to cart.
      * @return returns the index page! This one could seriously  use a refactor.
      */
-    public static ModelAndView addProduct(String id) {
+    public static ModelAndView addProduct(Request req, String id) {
         logger.info("Adding product to cart...");
         Map params = new HashMap<>();
+        params.put("session",req.session().attribute("email"));
         params.put("title", "All products");
         params.put("products", productDataStore.getAll());
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
         Product product = productDataStore.find(Integer.parseInt(id));
         logger.debug("Find product by id {} = {}", id, product);
-        cartData.add(product);
-        params.put("cartSize", cartData.getCount());
+        cartData.add(product, getOrderIdFromSession(req));
+        params.put("cartSize", cartData.getCount(getOrderIdFromSession(req)));
         logger.debug("Rendering index page with params: {}", params);
         return new ModelAndView(params, "product/index");
     }
@@ -144,19 +167,20 @@ public class ProductController {
      * this value will show), sum of the price, currency and the cart html form.
      */
 
-    public static ModelAndView renderCart() {
+    public static ModelAndView renderCart(Request req) {
         logger.info("Rendering cart...");
         int sumPrice = 0;
         String firstCurrency = null;
         String nextCurrency = null;
         boolean isError = false;
         Map params = new HashMap<>();
+        params.put("session" ,req.session().attribute("email"));
         params.put("title", "Your cart");
-        params.put("cartProducts", cartData.getAll());
-        params.put("cartSize", cartData.getCount());
+        params.put("cartProducts", cartData.find(getOrderIdFromSession(req)).getCart());
+        params.put("cartSize", cartData.getCount(getOrderIdFromSession(req)));
         int firstLoop = 0;
         logger.info("Checking if currencies are the same in cart ...");
-        for (Map.Entry<Product, Integer> entry : cartData.getAll().entrySet()) {
+        for (Map.Entry<Product, Integer> entry : cartData.find(getOrderIdFromSession(req)).getCart().entrySet()) {
             sumPrice += entry.getKey().getDefaultPrice()*entry.getValue();
             if (firstLoop++ == 0) {
                 firstCurrency = entry.getKey().getDefaultCurrency().toString();
@@ -169,7 +193,7 @@ public class ProductController {
                 }
             }
         }
-        if (isError == false) {
+        if (!isError) {
             logger.info("Currency check passed, no anomaly detected.");
         }
         params.put("isError", isError);
@@ -187,7 +211,7 @@ public class ProductController {
 
     public static void saveData(Request req){
         logger.info("Saving order to file...");
-        List<String> list = new ArrayList<>(Arrays.asList("Name", "E-mail", "Phone Number", "Billing Address", "Billing City", "Billing Zipcode", "Billing Country","Shipping Address", "Shipping City", "Shipping Zipcode",  "Shipping Country"));
+        List<String> list = new ArrayList<>(Arrays.asList("Phone Number", "Billing Address", "Billing City", "Billing Zipcode", "Billing Country", "Shipping Address", "Shipping City", "Shipping Zipcode",  "Shipping Country"));
         LinkedHashMap userData = new LinkedHashMap();
         JSONObject json = new JSONObject();
 
@@ -195,13 +219,15 @@ public class ProductController {
             userData.put(data, req.queryParams(data));
             json.put(data, req.queryParams(data));
         }
-        Order order = new Order(cartData.getAll(), userData);
+        User user = new User(userData);
+        userDataJDBC.updateUser(user);
+        Order order = new Order(getOrderIdFromSession(req), userDataJDBC.getUser(getUserIdFromSession(req)), cartData.find(getOrderIdFromSession(req)), Status.CHECKED_OUT);
         logger.debug("New order: {}", order);
-        orderData.add(order);
-        json.put("Ordered Items", cartData.getAll());
-        json.put("Order ID", orderData.getLast().getId());
+        orderData.add(order, getUserIdFromSession(req));
+        json.put("Ordered Items", cartData.find(getOrderIdFromSession(req)));
+        json.put("Order ID", getOrderIdFromSession(req));
         logger.info("Writing order to file...");
-        try (FileWriter file = new FileWriter("target/json/order" + orderData.getLast().getId() + ".json")) {
+        try (FileWriter file = new FileWriter("target/json/order" + getOrderIdFromSession(req) + ".json")) {
 
             file.write(json.toJSONString());
             file.flush();
@@ -219,51 +245,84 @@ public class ProductController {
      * @return Returns order, user data, the order ID, sum of the price,
      * a message if the process was successful and the confirmation html form.
      */
-    public static ModelAndView confirmation() {
+    public static ModelAndView confirmation(Request req) {
         int sumPrice = 0;
         Map params = new HashMap();
-        for (Map.Entry<Product, Integer> entry : cartData.getAll().entrySet()) {
+        for (Map.Entry<Product, Integer> entry : cartData.find(getOrderIdFromSession(req)).getCart().entrySet()) {
             sumPrice += entry.getKey().getDefaultPrice() * entry.getValue();
         }
-        logger.error("CLEAR CART IS NOT WORKING ATM");
-        cartData.clearCart();
+        params.put("session" ,req.session().attribute("email"));
         params.put("message", "Payment successful!");
-        params.put("userData", orderData.getLast().getUserData());
-        params.put("orderData", orderData.getLast().getOrder());
-        params.put("orderId", orderData.getLast().getId());
+        params.put("userData", userDataJDBC.getUser(getUserIdFromSession(req)).getUserData());
+        params.put("orderData", cartData.find(getOrderIdFromSession(req)).getCart());
+        params.put("orderId", getOrderIdFromSession(req));
         params.put("sumPrice", sumPrice);
         logger.info("Sending email with order...");
-        logger.debug("Sending email with order: {}", orderData.getLast());
-        Email.sendEmail(orderData.getLast());
+        Email.sendEmail(cartData.find(getOrderIdFromSession(req)), userDataJDBC.getUser(getUserIdFromSession(req)), getOrderIdFromSession(req));
+        orderData.changeStatus(getOrderIdFromSession(req), Status.PAID);
+        Order order = new Order(userDataJDBC.getUser(getUserIdFromSession(req)));
+        orderData.add(order, getUserIdFromSession(req));
         return new ModelAndView(params, "confirmation");
     }
 
     /**
-     * Calls the remove method for the target product from the cart.
-     * @param id product id which to remove.
+     * Calls the removeByOrderId method for the target product from the cart.
+     * @param id product id which to removeByOrderId.
      */
-    public static void removeProduct(Integer id) {
+    public static void removeProduct(Request req, Integer id) {
         logger.info("Removing product...");
         logger.debug("Removing product with id: {}", id);
-        cartData.remove(id);
+        cartData.removeProduct(id, getOrderIdFromSession(req));
     }
 
     /**
      * Changes a quantity of the target product in the cart.
-     * If changed to 0, calls remove, otherwise setQuantity.
+     * If changed to 0, calls removeByOrderId, otherwise setProductQuantity.
      * @param id product id which to set quantity on.
      * @param quantity numeric value of quantity to set on.
      */
-    public static void changeQuantity(Integer id, Integer quantity){
+    public static void changeQuantity(Request req, Integer id, Integer quantity){
         logger.info("Changing quantity of a product..");
         if (quantity == 0) {
             logger.debug("Quantity = {}. Removing product with id: {}",quantity, id);
-            cartData.remove(id);
+            cartData.removeByOrderId(id);
         } else {
             logger.debug("Quantity = {}. Setting quantity of the product with id: {}",quantity, id);
-            cartData.setQuantity(id, quantity);
+            cartData.setProductQuantity(id, getOrderIdFromSession(req), quantity);
         }
 
+    }
+
+    public static ModelAndView login(Request req, Response res){
+        Map params = new HashMap();
+        params.put("title", "Login");
+        return new ModelAndView(params, "login");
+    }
+
+    public static ModelAndView signUp(Request req, Response res){
+        Map params = new HashMap();
+        params.put("title", "Sign Up");
+        return new ModelAndView(params, "signUp");
+    }
+
+    public static void saveUser(Request req, Response res) {
+        String password = com.codecool.shop.Password.hashPassword(req.queryParams("password"));
+        userDataJDBC.saveUserData(req.queryParams("name"), req.queryParams("email"), password);
+        Order order = new Order(userDataJDBC.getUser(getUserIdByEmail(req.queryParams("email"))));
+        orderData.add(order, getUserIdByEmail(req.queryParams("email")));
+    }
+
+    public static boolean checkLogin(Request req, Response res) {
+        if (userDataJDBC.getPassByEmail(req.queryParams("email")).equals("")) return false;
+        return com.codecool.shop.Password.checkPassword(req.queryParams("password"), userDataJDBC.getPassByEmail(req.queryParams("email")));
+    }
+
+    public static int getUserIdByEmail(String email) {
+        return userDataJDBC.getUserId(email);
+    }
+
+    public static boolean check(Request req) {
+        return userDataJDBC.emailCheck(req.queryParams("email"));
     }
 
 }

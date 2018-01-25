@@ -2,8 +2,11 @@ package com.codecool.shop.dao.implementation;
 
 import com.codecool.shop.controller.ProductController;
 import com.codecool.shop.dao.CartDao;
+import com.codecool.shop.dao.ProductDao;
 import com.codecool.shop.database.ConnectionHandler;
 import com.codecool.shop.database.TypeCaster;
+import com.codecool.shop.model.Cart;
+import com.codecool.shop.model.Order;
 import com.codecool.shop.model.Product;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +32,7 @@ import java.util.*;
 public class CartDaoJDBC implements CartDao {
     private static CartDaoJDBC instance = null;
     private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+    private static ProductDao productDataStore = ProductDaoJDBC.getInstance();
 
     /**
      * Checks if a CartDaoJDBC instance exists. If so returns it. Otherwise it creates a new.
@@ -53,68 +57,44 @@ public class CartDaoJDBC implements CartDao {
      * @param product the desired product to add.
      */
     @Override
-    public void add(Product product) {
-        logger.warn("Not working with multiple users");
-        logger.debug("Starting method with arg: {}", product);
-        if (product == null) {
-            logger.warn("Product is null");
-            throw new IllegalArgumentException();
-        }
-        try (ConnectionHandler conn = new ConnectionHandler()) {
-            logger.info("Connected to database");
-            ResultSet resultSet= conn.process("SELECT * FROM cart");
-            logger.debug("resultSet of select * from cart: {}", resultSet);
-            String productList = null;
-            while (resultSet.next()) {
-                productList = resultSet.getString(2);
-            }
-            logger.debug("productList from resultSet col 2: {}", productList);
-            List<TypeCaster> args = new ArrayList<>();
-            args.add(new TypeCaster(productList + "," + product.getId(),false));
-            logger.debug("Update cart product_list with: {},{}", productList,product.getId());
-            conn.execute("UPDATE cart SET product_list = ?",args);
+    public void add(Product product, int orderId) {
+        try (ConnectionHandler con = new ConnectionHandler()){
+            List<TypeCaster> list = new ArrayList<>();
+            list.add(new TypeCaster(String.valueOf(product.getId()), true));
+            list.add(new TypeCaster(String.valueOf(orderId), true));
+            con.execute("INSERT INTO cart VALUES (DEFAULT, ?, ?);", list);
+            logger.debug("Product added to database");
         } catch (SQLException e) {
-            logger.error("Database connection error");
+            logger.warn("Connection to database failed while adding product to database");
             e.printStackTrace();
         }
     }
 
-    /**
-     * This method is for to get all the products from cart.
-     * Selects all from cart, takes the second column(products id list),
-     * then transforms it to a hashmap.
-     * @return hashmap with products in the cart.
-     */
     @Override
-    public Map<Product, Integer> getAll() {
-        logger.warn("Not working with multiple users");
-        Map<Product, Integer> resultMap= new HashMap<>();
-        try (ConnectionHandler conn = new ConnectionHandler()) {
-            logger.info("Connected to database");
-            ResultSet resultSet= conn.process("SELECT * FROM cart");
-            logger.debug("resultSet of select * from cart: {}", resultSet);
-            String productList = null;
-            while (resultSet.next()) {
-                productList = resultSet.getString(2);
-            }
-            logger.debug("productList from resultSet col 2: {}", productList);
-            List<String> productIdList = Arrays.asList(productList.split("\\s*,\\s*"));
-            logger.debug("productIdList: {}", productIdList);
-            for(String str: productIdList){
-                Product product = ProductDaoJDBC.getInstance().find(Integer.parseInt(str));
-                if (resultMap.containsKey(product)) {
-                    resultMap.put(product, resultMap.get(product)+1);
-                } else {
-                    resultMap.put(product,1);
-                }
-            }
-            logger.debug("returning cart hashmap: {}", resultMap);
-        } catch (SQLException e) {
-            logger.error("Database Connection error");
-            e.printStackTrace();
+    public Cart find(int orderId) {
+        String query = "SELECT product_id FROM cart WHERE order_id = ?;";
+        Cart cart = new Cart(orderId);
 
+        try(ConnectionHandler conn = new ConnectionHandler()) {
+            ArrayList<TypeCaster> list = new ArrayList<>();
+            list.add(new TypeCaster(String.valueOf(orderId), true));
+            ResultSet rs = conn.process(query, list);
+            while (rs.next()) {
+                Product product = productDataStore.find(rs.getInt("product_id"));
+                cart.add(product);
+            }
         }
-        return resultMap;
+        catch (SQLException e) {
+            logger.warn("Connection to database failed while trying to find product in database");
+        }
+        if (cart != null) {
+            logger.debug("Products found in memory and returned");
+            return cart;
+        }
+        else {
+            logger.warn("Product category not found in database");
+            return null;
+        }
     }
 
     /**
@@ -124,9 +104,9 @@ public class CartDaoJDBC implements CartDao {
      * @return number of products in the cart.
      */
     @Override
-    public int getCount() {
+    public int getCount(int orderId) {
         Integer count=0;
-        for (Integer value: getAll().values()) {
+        for (Integer value : find(orderId).getCart().values()) {
             count += value;
         }
         logger.debug("Count value of cart: {}", count);
@@ -137,105 +117,55 @@ public class CartDaoJDBC implements CartDao {
      * This is malfunctioning.
      */
     @Override
-    public void clearCart() {
+    public void removeByOrderId(int orderId) {
+        ArrayList<TypeCaster> queryList = new ArrayList<>();
+        queryList.add(new TypeCaster(String.valueOf(orderId), true));
         try (ConnectionHandler conn = new ConnectionHandler()) {
-            conn.execute("DELETE FROM cart");
+            conn.execute("DELETE FROM cart WHERE order_id=?", queryList);
         } catch (SQLException e) {
             e.printStackTrace();
         }
 
     }
 
-    /**
-     * This method is to remove a product from cart table.
-     * Selects all from cart, takes the second column(product list),
-     * then iterates through it, and if the id in product list does not match
-     * with the param id, appends a string with it + ",". (This solution is malfunctioning
-     * in case there is only 1 product left!!)
-     * Then cuts the built string last char and updates the cart with it.
-     *
-     * @param id desired product id to remove
-     */
     @Override
-    public void remove(int id) {
-        logger.warn("Not working with multiple users");
-        try  (ConnectionHandler conn = new ConnectionHandler()) {
-            logger.debug("Connected to database");
-            ResultSet resultSet= conn.process("SELECT * FROM cart");
-            logger.debug("resultSet of select * from cart: {}", resultSet);
-            String productList = null;
-            while (resultSet.next()) {
-                productList = resultSet.getString(2);
-            }
-            logger.debug("productList from resultSet col 2: {}", productList);
-            List<String> productIdList = new ArrayList<>(Arrays.asList(productList.split("\\s*,\\s*")));
-            logger.debug("productIdList: {}", productIdList);
-            StringBuilder arg = new StringBuilder();
-            for (String productId: productIdList){
-                if (!productId.equals(Integer.toString(id))) {
-                    arg.append(productId).append(",");
+    public void removeProduct(int productId, int orderId) {
+        ArrayList<TypeCaster> queryList = new ArrayList<>();
+        queryList.add(new TypeCaster(String.valueOf(productId), true));
+        queryList.add(new TypeCaster(String.valueOf(orderId), true));
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            conn.execute("DELETE FROM cart WHERE id = any (array(SELECT id FROM cart WHERE product_id = ? AND order_id = ? LIMIT 1));", queryList);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    @Override
+    public void setProductQuantity(int productId, int orderId, int quantity) {
+        String query = "SELECT COUNT(*) FROM cart WHERE product_id = ? AND order_id = ?;";
+        ArrayList<TypeCaster> queryList = new ArrayList<>();
+        queryList.add(new TypeCaster(String.valueOf(productId), true));
+        queryList.add(new TypeCaster(String.valueOf(orderId), true));
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            ResultSet rs = conn.process(query, queryList);
+            rs.next();
+            int count = rs.getInt("count");
+            int difference = quantity - count;
+            if (difference > 0) {
+                for (int i = 0; i < difference; i++) {
+                    add(productDataStore.find(productId), orderId);
                 }
             }
-            logger.warn("Problem near; creating arg with stringbuilder: {}", arg.toString());
-            List<TypeCaster> args = new ArrayList<>();
-            args.add(new TypeCaster(arg.toString().substring(0,arg.length()-1),false));
-            logger.debug("Update cart product_list with: {}", arg.toString().substring(0,arg.length()-1));
-            conn.execute("UPDATE cart SET product_list = ?",args);
+            else if (difference < 0) {
+                for (int i = 0; i < -difference; i++) {
+                    removeProduct(productId, orderId);
+                }
+            }
         } catch (SQLException e) {
-            logger.error("Database Connection error");
             e.printStackTrace();
         }
     }
 
-    /**
-     * This method is for to set quantity of a target product in the cart.
-     * If quantity is less than zero, throws exception.
-     * In case quantity equals zero, it calls the remove method on the target product
-     * and returns.
-     * Otherwise it calls remove on the target id then,
-     * selects all from cart, takes the second column(product list),
-     * then appends the product list + "," with the id of the target product as many times
-     * as the quantity was set.(This solution is malfunctioning
-     * in case there is only 1 product left!!)
-     * Updates cart with the new product list.
-     * @param id product id
-     * @param quantity desired quantity
-     */
-    @Override
-    public void setQuantity(int id, int quantity) {
-        logger.warn("Not working with multiple users");
-        if (quantity < 0) {
-            logger.warn("Quantity = {}", quantity);
-            throw new IllegalArgumentException();
-        }
-        if (quantity == 0) {
-            logger.debug("Quantity = {}, removing product with id: {}", quantity,id);
-            remove(id);
-            return;
-        }
-        try (ConnectionHandler conn = new ConnectionHandler()) {
-            logger.debug("Connected to database");
-            logger.debug("removing product id: {}", id);
-            remove(id);
-            ResultSet resultSet = conn.process("SELECT * FROM cart");
-            logger.debug("resultSet of select * from cart: {}", resultSet);
-            String productList = null;
-            while (resultSet.next()) {
-                productList = resultSet.getString(2);
-            }
-            logger.debug("productList from resultSet col 2: {}", productList);
-            StringBuilder quantityString = new StringBuilder();
-            for (int i = 0; i<quantity; i++) {
-                quantityString.append(id).append(",");
-            }
-            logger.warn("Problem near; creating arg with stringbuilder: {}", quantityString.toString());
-            List<TypeCaster> args = new ArrayList<>();
-            args.add(new TypeCaster(productList + "," + quantityString.toString().substring(0,quantityString.length()-1),false));
-            logger.debug("Update cart product_list with: {},{}", productList, quantityString.toString().substring(0,quantityString.length()-1));
-            conn.execute("UPDATE cart SET product_list = ?",args);
-        } catch (SQLException e) {
-            logger.error("Database Connection error");
-            e.printStackTrace();
-        }
-    }
 }

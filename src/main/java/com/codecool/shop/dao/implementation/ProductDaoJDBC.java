@@ -15,7 +15,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 /**
- * This is a simple product data access object which serves the Product class and helpes it to
+ * This is a simple product data access object which serves the Product class and helps it to
  * communicate with the database.
  * <p>
  * It implements the ProductDao interface.
@@ -58,7 +58,7 @@ public class ProductDaoJDBC implements ProductDao {
             list.add(new TypeCaster(product.getDescription(), false));
             list.add(new TypeCaster(Integer.toString(product.getProductCategory().getId()), true));
             list.add(new TypeCaster(Integer.toString(product.getSupplier().getId()), true));
-            con.process("INSERT INTO product VALUES (DEFAULT, ?, ?, ?,  ?, ?, ?);", list);
+            con.process("INSERT INTO product VALUES (DEFAULT, ?, ?, ?, ?, ?, ?);", list);
             logger.debug("Product added to database");
         } catch (SQLException e) {
             logger.warn("Connection to database failed while adding product to database");

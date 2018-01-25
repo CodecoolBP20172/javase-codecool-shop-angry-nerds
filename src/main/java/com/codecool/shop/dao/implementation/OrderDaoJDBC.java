@@ -1,17 +1,22 @@
 package com.codecool.shop.dao.implementation;
 
 
+import com.codecool.shop.dao.CartDao;
+import com.codecool.shop.dao.ProductCategoryDao;
+import com.codecool.shop.dao.SupplierDao;
+import com.codecool.shop.database.TypeCaster;
+import com.codecool.shop.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.codecool.shop.dao.OrderDao;
 import com.codecool.shop.database.ConnectionHandler;
-import com.codecool.shop.model.Order;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -28,7 +33,12 @@ import java.util.List;
 public class OrderDaoJDBC implements OrderDao{
 
     private static OrderDaoJDBC instance = null;
+    private static CartDao cartData = CartDaoJDBC.getInstance();
+    private static UserJDBC userDataJDBC = UserJDBC.getInstance();
+    private static ProductCategoryDao productCategoryDataStore = ProductCategoryDaoJDBC.getInstance();
+    private static SupplierDao supplierDataStore = SupplierDaoJDBC.getInstance();
     private static final Logger logger = LoggerFactory.getLogger(OrderDaoJDBC.class);
+    private static int CurrentOrderId;
 
     private OrderDaoJDBC() {
     }
@@ -47,6 +57,14 @@ public class OrderDaoJDBC implements OrderDao{
         return instance;
     }
 
+    public static int getCurrentOrderId() {
+        return CurrentOrderId;
+    }
+
+    public static void setCurrentOrderId(int currentOrderId) {
+        CurrentOrderId = currentOrderId;
+    }
+
     /**
      * This method adds an Order to the database. It has one parameter, which is an
      * Order that gets inserted into the database. If the argument is null it throws
@@ -55,14 +73,17 @@ public class OrderDaoJDBC implements OrderDao{
      * @throws IllegalArgumentException if the parameter order equals to null
      */
     @Override
-    public void add(Order order) {
+    public void add(Order order, int userId) {
         if (order == null) {
             logger.debug("OrderDaoJDBC add method received invalid argument");
             throw new IllegalArgumentException();
         }
-        String query = "INSERT INTO orders (user_data_id, cart_id) VALUES (1, 1);";
+        String query = "INSERT INTO orders (user_data_id, status) VALUES (?, ?);";
         try(ConnectionHandler handler = new ConnectionHandler()) {
-            handler.execute(query);
+            ArrayList<TypeCaster> queryList = new ArrayList<>();
+            queryList.add(new TypeCaster(String.valueOf(userId), true));
+            queryList.add(new TypeCaster(String.valueOf(order.getStatus()), false));
+            handler.execute(query, queryList);
             logger.debug("Order added successfully to database");
         } catch (SQLException e){
             e.printStackTrace();
@@ -70,59 +91,53 @@ public class OrderDaoJDBC implements OrderDao{
         }
     }
 
-    /**
-     * This method gets all the orders from the database and returns them in a list.
-     * <p>
-     * It uses the ConnectionHandler class to establish connection to the database. If it fails, it
-     * logs a warning about connection failure. However, if the connection went through without problems,
-     * it then returns all the orders in a List.
-     * @return a List, which contains all the orders
-     */
     @Override
-    public List<Order> getAll() {
-        List<Order> orders = new ArrayList <>();
-        String query = "SELECT * FROM orders;";
-        try (ConnectionHandler handler = new ConnectionHandler()) {
-            ResultSet rs = handler.process(query);
-            while (rs.next()) {
-                int id = rs.getInt("id");
-                int userDataId = rs.getInt("user_data_id");
-                int cartId = rs.getInt("cart_id");
-                orders.add(new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId).getUserData())); //CartDao needs a get
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            logger.warn("Connection to database failed while trying get all order from database");
-        }
-        logger.debug("Returning all orders in a list");
-        return orders;
-    }
-
-    /**
-     * This method gets the last order from the database and returns it.
-     * <p>
-     * It uses the ConnectionHandler class to establish connection to the database. If it fails, it
-     * logs a warning about connection failure. However, if the connection went through without problems,
-     * then it returns the last order.
-     * @return an Order, which is the last order in the database.
-     */
-    @Override
-    public Order getLast() {
-        Order lastOrder = null;
-        String query = "SELECT * FROM orders ORDER BY id DESC limit 1;";
+    public void changeStatus(int orderId, Status status) {
+        String query = "UPDATE orders SET status = ? WHERE id = ?;";
         try(ConnectionHandler handler = new ConnectionHandler()) {
-            ResultSet rs = handler.process(query);
-            rs.next();
-            int id = rs.getInt("id");
-            int userDataId = rs.getInt("user_data_id");
-            int cartId = rs.getInt("cart_id");
-            lastOrder = new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId).getUserData());
-            lastOrder.setId(id);
+            ArrayList<TypeCaster> queryList = new ArrayList<>();
+            queryList.add(new TypeCaster(String.valueOf(status), false));
+            queryList.add(new TypeCaster(String.valueOf(orderId), true));
+            handler.execute(query, queryList);
+            logger.debug("Order status changed");
         } catch (SQLException e){
             e.printStackTrace();
-            logger.warn("Connection to database failed while trying get the last order from database");
+            logger.warn("Connection to database failed while updating order to database");
         }
-        logger.debug("Returning the last order in a list");
-        return lastOrder;
+    }
+
+    public List<Order> findByUserId(int userId) {
+        String query = "SELECT * FROM orders WHERE user_data_id = ?;";
+        List<Order> listOfOrders = new ArrayList<>();
+        try(ConnectionHandler conn = new ConnectionHandler()) {
+            ArrayList<TypeCaster> list = new ArrayList<>();
+            list.add(new TypeCaster(String.valueOf(userId), true));
+            ResultSet rs = conn.process(query, list);
+            while (rs.next()) {
+                Integer orderId = rs.getInt("id");
+                String status = rs.getString("status");
+                Order order = new Order(orderId, userDataJDBC.getUser(userId),cartData.find(orderId),Status.valueOf(status));
+                listOfOrders.add(order);
+            }
+        }
+        catch (SQLException e) {
+            logger.warn("Connection to database failed while trying to find product in database");
+        }
+        if (listOfOrders.get(0) != null) {
+            logger.debug("Orders found in memory and returned");
+            return listOfOrders;
+        }
+        else {
+            logger.warn("No order found in database for this id");
+            return null;
+        }
+    }
+
+    public Order findByUserIdAndStatus(int userId, Status status) {
+        List<Order> listOfOrders = findByUserId(userId);
+        for (Order order : listOfOrders) {
+            if (order.getStatus().equals(status)) return order;
+        }
+        return null;
     }
 }

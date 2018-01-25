@@ -1,5 +1,6 @@
 package com.codecool.shop.dao.implementation;
 
+import com.codecool.shop.model.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,7 +52,7 @@ public class OrderDaoMem implements OrderDao {
      * @throws IllegalArgumentException if the parameter category equals to null
      */
     @Override
-    public void add(Order order) {
+    public void add(Order order, int userId) {
         if (order == null) {
             logger.debug("OrderDaoMem add method received invalid argument");
             throw new IllegalArgumentException();
@@ -61,29 +62,19 @@ public class OrderDaoMem implements OrderDao {
         logger.debug("Order added successfully to the memory");
     }
 
-    /**
-     * This method gets all the Orders from the memory and returns them in a List.
-     * @return a List, which contains all the Orders
-     */
     @Override
-    public List<Order> getAll() {
-        logger.debug("Returning all Orders stored in memory");
-        return DATA;
+    public void changeStatus(int orderId, Status status) {
+
     }
 
-    /**
-     * This method gets the last Order from the memory and returns it.
-     * @return an Order, which is the last in the memory.
-     */
     @Override
-    public Order getLast() {
-        if (DATA.size() < 1){
-            logger.debug("Returning null instead of last Order because no Order has been stored in memory");
-            return null;
-        }
-        logger.debug("Returning the last Order stored in memory");
-        return DATA.get(DATA.size()-1);
+    public List<Order> findByUserId(int userId) {
+        return null;
     }
 
+    @Override
+    public Order findByUserIdAndStatus(int userId, Status status) {
+        return null;
+    }
 
 }

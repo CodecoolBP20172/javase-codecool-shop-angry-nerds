@@ -5,12 +5,16 @@ import com.codecool.shop.controller.ProductController;
 import com.codecool.shop.dao.*;
 import com.codecool.shop.dao.implementation.*;
 import com.codecool.shop.model.*;
+import spark.ModelAndView;
 import spark.Request;
 import spark.Response;
 import spark.template.thymeleaf.ThymeleafTemplateEngine;
 
-public class Main {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
+public class Main {
     public static void main(String[] args) throws IllegalArgumentException{
 
         // default server settings
@@ -21,8 +25,11 @@ public class Main {
         // populate some data for the memory storage
         populateData();
 
-        // Always start with more specific routes
-        get("/hello", (req, res) -> "Hello World");
+        before("/protected/*", (request, response) -> {
+            if (request.session().attribute("email") == null) {
+                halt(501, "Login for this page");
+            }
+            });
 
         // Always add generic routes to the end
         get("/", ProductController::renderProducts, new ThymeleafTemplateEngine());
@@ -30,41 +37,84 @@ public class Main {
         get("/index", (Request req, Response res) -> {
            return new ThymeleafTemplateEngine().render( ProductController.renderProducts(req, res) );
         });
-        get("listby/:supOrCat/:id", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req.params(":supOrCat"), req.params(":id")) );
+        get("/listby/:supOrCat/:id", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req ,req.params(":supOrCat"), req.params(":id")) );
         });
-        get("cart/:id", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render( ProductController.addProduct(req.params(":id")) );
+        get("/protected/cart/:id", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render( ProductController.addProduct(req,req.params(":id")) );
         });
-        get("/showcart/", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
+        get("/protected/showcart", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
-        get("/remove/:id", (Request req, Response res) -> {
-            ProductController.removeProduct(Integer.parseInt(req.params(":id")));
-            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
+        get("/protected/remove/:id", (Request req, Response res) -> {
+            ProductController.removeProduct(req, Integer.parseInt(req.params(":id")));
+            return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
-        get("/changeQuantity/:id", (Request req, Response res) -> {
-            ProductController.changeQuantity(Integer.parseInt(req.params(":id")),Integer.parseInt(req.queryParams("quantity")));
-            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
-        });
-
-
-
-        get("/checkout", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render(ProductController.forms("Checkout"));
+        get("/protected/changeQuantity/:id", (Request req, Response res) -> {
+            ProductController.changeQuantity(req,Integer.parseInt(req.params(":id")),Integer.parseInt(req.queryParams("quantity")));
+            return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
 
-        post("/payment", (Request req, Response res) -> {
+
+
+        get("/protected/checkout", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Checkout", req));
+        });
+
+        post("/protected/payment", (Request req, Response res) -> {
             ProductController.saveData(req);
-            return new ThymeleafTemplateEngine().render(ProductController.forms("Payment", req.queryParams("payment")));
+            return new ThymeleafTemplateEngine().render(ProductController.forms("Payment", req.queryParams("payment"), req));
         });
 
-        post("/confirm", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render(ProductController.confirmation());
+        post("/protected/confirm", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.confirmation(req));
         });
+
+        get("/login", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.login(req, res));
+        });
+
+        get("/sign-up", (Request req, Response res) -> {
+            return new ThymeleafTemplateEngine().render(ProductController.signUp(req, res));
+        });
+
+        post("/login", (Request req, Response res) -> {
+            //check login here
+            if (ProductController.checkLogin(req, res)) {
+                req.session(true);
+                req.session().attribute("email",req.queryParams("email"));
+                int userId = ProductController.getUserIdByEmail(req.queryParams("email"));
+                req.session().attribute("userId", String.valueOf(userId));
+                res.redirect("/");
+            } else {
+                halt(401, "Invalid login");
+                res.redirect("/");
+            }
+            return null;
+        });
+
+        post("/sign-up", (Request req, Response res) -> {
+            //save user data here
+            if (ProductController.check(req)){
+                req.session(true);
+                req.session().attribute("email",req.queryParams("email"));
+                ProductController.saveUser(req, res);
+                res.redirect("/login");
+            } else {
+                res.redirect("/sign-up");
+            }
+            return null;
+        });
+
+        get("/logout", (Request req, Response res) -> {
+            req.session().removeAttribute("email");
+            res.redirect("/");
+            return null;
+                });
 
         // Add this line to your project to enable the debug screen
         enableDebugScreen();
+
     }
 
     public static void populateData() throws IllegalArgumentException {

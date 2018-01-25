@@ -37,13 +37,12 @@ public class Email {
      * and creates a session with them. Then it sets up recipients, subject and finally concatenates a short
      * message with all the order information and sends it out to the customer. If the sending was unsuccessful,
      * it throws a RuntimeException.
-     * @param order the parameter is used to get information about the order which is then composed to the e-mail
      */
-    public static void sendEmail(Order order) {
+    public static void sendEmail(Cart cart, User user, int orderId) {
 
         final String username = "codecoolshop.angrynerds@gmail.com";
         final String password = "Honolulu27";
-        Map userData = order.getUserData();
+        Map userData = user.getUserData();
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -67,10 +66,10 @@ public class Email {
             message.setFrom(new InternetAddress("peter.bernath.27@gmail.com"));
             message.setRecipients(Message.RecipientType.TO,
                     InternetAddress.parse((String) userData.get("E-mail")));
-            message.setSubject("Order No. " + order.getId() + " Confirmation");
+            message.setSubject("Order No. " + orderId + " Confirmation");
             message.setText("Dear " + userData.get("Name") + ","
                     + "\n\n Thank You for your order! Your order details can be found below in this e-mail."
-                    + "\n\n Order number: " + order.getId()
+                    + "\n\n Order number: " + orderId
                     + "\n Name: " + userData.get("Name")
                     + "\n E-mail: " + userData.get("E-mail")
                     + "\n Phone Number: " + userData.get("Phone Number")
@@ -83,7 +82,7 @@ public class Email {
                     + "\n Shipping Zipcode: " + userData.get("Shipping Zipcode")
                     + "\n Shipping Country: " + userData.get("Shipping Country")
                     + "\n\n Ordered items: \n"
-                    + convertOrder(order.getOrder())
+                    + convertOrder(cart.getCart())
                     + "\n\n We wish You merry christmas and hope You will shop with us next time!"
                     + "\n Best regards,"
                     + "\n\n Your CodeCool Shop");
@@ -108,14 +107,14 @@ public class Email {
      */
     private static String convertOrder(Map<Product, Integer> map) {
         String orderString = "";
-        int total = 0;
+        float total = 0;
         for (Product name: map.keySet()){
 
             String key = name.getName();
             String value = map.get(name).toString();
             String price = name.getPrice();
             orderString += "\n " + value + "x   " + key + "       " + price;
-            total += Integer.parseInt(name.getPrice().substring(0, name.getPrice().length() - 6)) * Integer.parseInt(value);
+            total += Float.parseFloat(name.getPrice().substring(0, name.getPrice().length() - 3)) * Integer.parseInt(value);
         }
         orderString += "\n --------------------------------------------------";
         orderString += "\n Total amount paid:        " + String.valueOf(total) + " USD";
