@@ -2,7 +2,8 @@ ALTER TABLE IF EXISTS ONLY public.cart DROP CONSTRAINT IF EXISTS pk_cart_id CASC
 ALTER TABLE IF EXISTS ONLY public.user_data DROP CONSTRAINT IF EXISTS pk_user_data_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.orders DROP CONSTRAINT IF EXISTS pk_orders_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.orders DROP CONSTRAINT IF EXISTS fk_user_data_id CASCADE;
-ALTER TABLE IF EXISTS ONLY public.orders DROP CONSTRAINT IF EXISTS fk_cart_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.cart DROP CONSTRAINT IF EXISTS fk_order_id CASCADE;
+ALTER TABLE IF EXISTS ONLY public.cart DROP CONSTRAINT IF EXISTS fk_product_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.product DROP CONSTRAINT IF EXISTS pk_product_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.product DROP CONSTRAINT IF EXISTS fk_product_category_id CASCADE;
 ALTER TABLE IF EXISTS ONLY public.product DROP CONSTRAINT IF EXISTS fk_supplier_id CASCADE;
@@ -13,7 +14,8 @@ DROP TABLE IF EXISTS public.cart;
 DROP SEQUENCE IF EXISTS public.question_id_seq;
 CREATE TABLE cart (
     id serial NOT NULL,
-    product_list text NOT NULL
+    product_id integer,
+    order_id integer
 );
 
 DROP TABLE IF EXISTS public.user_data;
@@ -39,7 +41,7 @@ DROP SEQUENCE IF EXISTS public.orders_id_seq;
 CREATE TABLE orders (
     id serial NOT NULL,
     user_data_id integer,
-    cart_id integer
+    status text
 );
 
 
@@ -96,8 +98,11 @@ ALTER TABLE ONLY supplier
 ALTER TABLE ONLY orders
     ADD CONSTRAINT fk_user_data_id FOREIGN KEY (user_data_id) REFERENCES user_data(id);
 
-ALTER TABLE ONLY orders
-    ADD CONSTRAINT fk_cart_id FOREIGN KEY (cart_id) REFERENCES cart(id) ;
+ALTER TABLE ONLY cart
+    ADD CONSTRAINT fk_order_id FOREIGN KEY (order_id) REFERENCES orders(id) ;
+
+ALTER TABLE ONLY cart
+    ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES product(id) ;
 
 
 INSERT INTO supplier VALUES(1, 'Amazon', 'Digital content and services');
@@ -119,8 +124,5 @@ SELECT pg_catalog.setval('product_id_seq', 3, true);
 INSERT INTO user_data VALUES(1, 'Gipsz Jakab', 'testemail@gmail.com', '303377027', 'Kőbányai utca', 'Budakalász', '2011', 'Hungary', 'Déryné utca', 'Gödöllő', '2100', 'Hungary', '123');
 SELECT pg_catalog.setval('user_data_id_seq', 1, true);
 
-INSERT INTO cart VALUES(1, '1,1,2,3');
-SELECT pg_catalog.setval('cart_id_seq', 1, true);
-
-INSERT INTO orders VALUES(1, 1, 1);
+INSERT INTO orders VALUES(1, 1, 'In Cart');
 SELECT pg_catalog.setval('orders_id_seq', 1, true);

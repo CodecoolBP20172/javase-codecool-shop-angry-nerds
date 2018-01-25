@@ -1,10 +1,7 @@
 import com.codecool.shop.dao.OrderDao;
 import com.codecool.shop.dao.ProductDao;
 import com.codecool.shop.dao.implementation.*;
-import com.codecool.shop.model.Order;
-import com.codecool.shop.model.Product;
-import com.codecool.shop.model.ProductCategory;
-import com.codecool.shop.model.Supplier;
+import com.codecool.shop.model.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -45,6 +42,7 @@ public class TestDataMem {
         for (int i=0; i<list.size(); i++){
             userData.put(list.get(i), data.get(i));
         };
+        User user = new User(userData);
 
         productDaoMem.add(product1);
         productDaoMem.add(product2);
@@ -64,7 +62,7 @@ public class TestDataMem {
         cartDaoMem.add(product2);
         cartDaoMem.add(product3);
 
-        Order order = new Order(cartDaoMem.getAll(), userData);
+        Order order = new Order(cartDaoMem.getAll(), user);
 
         orderDaoMem.add(order);
 

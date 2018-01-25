@@ -39,11 +39,11 @@ public class Email {
      * it throws a RuntimeException.
      * @param order the parameter is used to get information about the order which is then composed to the e-mail
      */
-    public static void sendEmail(Order order) {
+    public static void sendEmail(Order order, User user) {
 
         final String username = "codecoolshop.angrynerds@gmail.com";
         final String password = "Honolulu27";
-        Map userData = order.getUserData();
+        Map userData = user.getUserData();
 
         Properties props = new Properties();
         props.put("mail.smtp.auth", "true");
@@ -83,7 +83,7 @@ public class Email {
                     + "\n Shipping Zipcode: " + userData.get("Shipping Zipcode")
                     + "\n Shipping Country: " + userData.get("Shipping Country")
                     + "\n\n Ordered items: \n"
-                    + convertOrder(order.getOrder())
+                    + convertOrder(order.getCart().getCart())
                     + "\n\n We wish You merry christmas and hope You will shop with us next time!"
                     + "\n Best regards,"
                     + "\n\n Your CodeCool Shop");

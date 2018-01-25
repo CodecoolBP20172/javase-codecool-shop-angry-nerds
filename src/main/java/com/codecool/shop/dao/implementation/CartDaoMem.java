@@ -1,8 +1,12 @@
 package com.codecool.shop.dao.implementation;
 
 
+import com.codecool.shop.controller.ProductController;
 import com.codecool.shop.dao.CartDao;
+import com.codecool.shop.model.Cart;
 import com.codecool.shop.model.Product;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -11,7 +15,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public class CartDaoMem implements CartDao {
 
-    private ConcurrentMap<Product, AtomicLong> DATA= new ConcurrentHashMap<Product, AtomicLong>();
+    private static final Logger logger = LoggerFactory.getLogger(ProductController.class);
+    private Map<Product, Integer> DATA= new HashMap<Product, Integer>();
     private static CartDaoMem instance = null;
 
     /* A private Constructor prevents any other class from instantiating.
@@ -27,27 +32,45 @@ public class CartDaoMem implements CartDao {
     }
 
     @Override
-    public void add(Product product) {
-        if (product == null) {
-            throw new IllegalArgumentException();
+    public void add(Product product, int orderId) {
+        DATA.put(product, orderId);
+    }
+
+    @Override
+    public Cart find(int orderId) {
+        Cart cart = new Cart(orderId);
+        for (Map.Entry<Product, Integer> data : DATA.entrySet()) {
+            if (orderId == data.getValue()) cart.add(data.getKey());
         }
-        if(DATA.containsKey(product)) {
-            DATA.get(product).incrementAndGet();
+        return cart;
+    }
+
+    @Override
+    public int getCount(int orderId) {
+        Integer count = 0;
+        for (Integer value : find(orderId).getCart().values()) {
+            count += value;
         }
-        else {
-            DATA.put(product, new AtomicLong(1));
+        logger.debug("Count value of cart: {}", count);
+        return count;
+    }
+
+    @Override
+    public void removeByOrderId(int orderId) {
+        for (Map.Entry<Product, Integer> data : DATA.entrySet()) {
+            if (data.getValue() == orderId) DATA.remove(data);
         }
     }
 
     @Override
-    public Map<Product, Integer> getAll() {
-        Map<Product, Integer> formedData = new HashMap<>();
-        for (Map.Entry<Product, AtomicLong> entry : DATA.entrySet()) {
-            formedData.put(entry.getKey(), entry.getValue().intValue());
-        }
-        return formedData;
+    public void setProductQuantity(int productId, int orderId, int quantity) {
+
     }
 
+    @Override
+    public void removeProduct(int productId, int orderId) {
+
+    }
 
     @Override
     public String toString() {
@@ -60,45 +83,5 @@ public class CartDaoMem implements CartDao {
 
         }
         return print.toString();
-    }
-    @Override
-    public void remove(int id) {
-        for (Map.Entry<Product, AtomicLong> entry : DATA.entrySet()) {
-            if (entry.getKey().getId() == id) {
-                DATA.remove(entry.getKey());
-                return;
-            }
-        }
-        throw new IllegalArgumentException();
-    }
-    @Override
-    public int getCount() {
-        int count = 0;
-        for (AtomicLong itemCount : DATA.values()) {
-            count += itemCount.intValue();
-        }
-        return count;
-    }
-    @Override
-    public void clearCart() {
-        DATA.clear();
-    }
-
-    @Override
-    public void setQuantity(int id, int quantity) {
-        if (quantity == 0){
-            remove(id);
-            return;
-        }
-        if (quantity < 0) {
-            throw new IllegalArgumentException();
-        }
-        for (Map.Entry<Product, AtomicLong> entry : DATA.entrySet()) {
-            if (entry.getKey().getId() == id) {
-                DATA.put(entry.getKey(), new AtomicLong(quantity));
-                return;
-            }
-        }
-        throw new IllegalArgumentException();
     }
 }

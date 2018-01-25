@@ -1,9 +1,6 @@
 package com.codecool.shop.dao;
 
-import com.codecool.shop.model.Order;
-import com.codecool.shop.model.Product;
-import com.codecool.shop.model.ProductCategory;
-import com.codecool.shop.model.Supplier;
+import com.codecool.shop.model.*;
 
 import java.util.List;
 
@@ -11,8 +8,8 @@ public interface OrderDao {
 
     void add(Order order);
 
-    List<Order> getAll();
+    public List<Order> findByUserId(int userId);
 
-    Order getLast();
+    public Order findByUserIdAndStatus(int userId, Status status);
 
 }

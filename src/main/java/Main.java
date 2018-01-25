@@ -96,6 +96,8 @@ public class Main {
             if (ProductController.saveUser(req, res)){
                 req.session(true);
                 req.session().attribute("email",req.queryParams("email"));
+                int userId = ProductController.getUserIdByEmail(req.queryParams("email"));
+                req.session().attribute("userId", String.valueOf(userId));
                 res.redirect("/");
             } else {
                 res.redirect("/sign-up");
