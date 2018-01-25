@@ -90,7 +90,7 @@ public class UserJDBC {
         return user;
     }
 
-    public void saveUserData(String name ,String email, String password) {
+    public boolean saveUserData(String name ,String email, String password) {
         if (emailCheck(email)) {
             try (ConnectionHandler conn = new ConnectionHandler()) {
                 List<TypeCaster> args = new ArrayList<>();
@@ -98,10 +98,12 @@ public class UserJDBC {
                 args.add(new TypeCaster(email, false));
                 args.add(new TypeCaster(password, false));
                 conn.execute("INSERT INTO user_data (id,name,email,password) VALUES(DEFAULT, ?, ?, ?)", args);
+                return true;
             } catch (SQLException e) {
                 e.printStackTrace();
             }
         }
+        return false;
 
     }
 
@@ -158,6 +160,30 @@ public class UserJDBC {
         }
         return result;
     }
+
+    public void updateUser(User user) {
+        LinkedHashMap<String, String> userData = user.getUserData();
+        String query = "UPDATE user_data SET phone_number = ?, billing_address = ?, billing_city = ?, billing_zipcode = ?, " +
+                       "billing_country = ?, shipping_address = ?, shipping_city = ?, shipping_zipcode = ?, shipping_country = ?;";
+        ArrayList<TypeCaster> queryList = new ArrayList<>();
+        queryList.add(new TypeCaster(userData.get("Phone Number"), false));
+        queryList.add(new TypeCaster(userData.get("Billing Address"), false));
+        queryList.add(new TypeCaster(userData.get("Billing City"), false));
+        queryList.add(new TypeCaster(userData.get("Billing Zipcode"), false));
+        queryList.add(new TypeCaster(userData.get("Billing Country"), false));
+        queryList.add(new TypeCaster(userData.get("Shipping Address"), false));
+        queryList.add(new TypeCaster(userData.get("Shipping City"), false));
+        queryList.add(new TypeCaster(userData.get("Shipping Zipcode"), false));
+        queryList.add(new TypeCaster(userData.get("Shipping Country"), false));
+        try(ConnectionHandler conn = new ConnectionHandler()) {
+            logger.debug("User added successfully to database");
+            conn.execute(query, queryList);
+            }
+        catch (SQLException e) {
+            logger.warn("Connection to database failed while adding product category to database");
+            }
+    }
+
 }
 
 

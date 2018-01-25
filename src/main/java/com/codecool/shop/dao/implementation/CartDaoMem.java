@@ -63,6 +63,16 @@ public class CartDaoMem implements CartDao {
     }
 
     @Override
+    public void setProductQuantity(int productId, int orderId, int quantity) {
+
+    }
+
+    @Override
+    public void removeProduct(int productId, int orderId) {
+
+    }
+
+    @Override
     public String toString() {
         List<String> print = new ArrayList<>();
         for (Product name: DATA.keySet()){

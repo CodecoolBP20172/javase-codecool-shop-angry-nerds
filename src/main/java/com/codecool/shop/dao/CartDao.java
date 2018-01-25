@@ -11,6 +11,8 @@ public interface CartDao {
     Cart find(int orderId);
     int getCount(int orderId);
     void removeByOrderId(int orderId);
+    void setProductQuantity(int productId, int orderId, int quantity);
+    public void removeProduct(int productId, int orderId);
 
 }
 

@@ -1,5 +1,6 @@
 package com.codecool.shop.dao.implementation;
 
+import com.codecool.shop.model.Status;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,6 +60,16 @@ public class OrderDaoMem implements OrderDao {
         order.setId(DATA.size() + 1);
         DATA.add(order);
         logger.debug("Order added successfully to the memory");
+    }
+
+    @Override
+    public List<Order> findByUserId(int userId) {
+        return null;
+    }
+
+    @Override
+    public Order findByUserIdAndStatus(int userId, Status status) {
+        return null;
     }
 
 }

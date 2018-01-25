@@ -33,18 +33,18 @@ public class Main {
             return new ThymeleafTemplateEngine().render( ProductController.renderProductsBy(req ,req.params(":supOrCat"), req.params(":id")) );
         });
         get("cart/:id", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render( ProductController.addProduct(req.params(":id")) );
+            return new ThymeleafTemplateEngine().render( ProductController.addProduct(req, req.params(":id")) );
         });
         get("/showcart/", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
+            return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
         get("/removeByOrderId/:id", (Request req, Response res) -> {
             ProductController.removeProduct(Integer.parseInt(req.params(":id")));
-            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
+            return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
         get("/changeQuantity/:id", (Request req, Response res) -> {
-            ProductController.changeQuantity(Integer.parseInt(req.params(":id")),Integer.parseInt(req.queryParams("quantity")));
-            return new ThymeleafTemplateEngine().render( ProductController.renderCart());
+            ProductController.changeQuantity(req, Integer.parseInt(req.params(":id")),Integer.parseInt(req.queryParams("quantity")));
+            return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
 
 
@@ -59,7 +59,7 @@ public class Main {
         });
 
         post("/confirm", (Request req, Response res) -> {
-            return new ThymeleafTemplateEngine().render(ProductController.confirmation());
+            return new ThymeleafTemplateEngine().render(ProductController.confirmation(req));
         });
 
         get("/login", (Request req, Response res) -> {
@@ -88,6 +88,8 @@ public class Main {
             if (ProductController.saveUser(req, res)){
                 req.session(true);
                 req.session().attribute("email",req.queryParams("email"));
+                int userId = ProductController.getUserIdByEmail(req.queryParams("email"));
+                req.session().attribute("userId", String.valueOf(userId));
                 res.redirect("/");
             } else {
                 res.redirect("/sign-up");

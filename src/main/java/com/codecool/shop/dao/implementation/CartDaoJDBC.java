@@ -128,4 +128,43 @@ public class CartDaoJDBC implements CartDao {
 
     }
 
+    @Override
+    public void removeProduct(int productId, int orderId) {
+        ArrayList<TypeCaster> queryList = new ArrayList<>();
+        queryList.add(new TypeCaster(String.valueOf(productId), true));
+        queryList.add(new TypeCaster(String.valueOf(orderId), true));
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            conn.execute("DELETE FROM cart WHERE id = any (array(SELECT * FROM cart WHERE product_id = ? AND order_id = ? LIMIT 1));", queryList);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    @Override
+    public void setProductQuantity(int productId, int orderId, int quantity) {
+        String query = "SELECT COUNT(*) FROM cart WHERE product_id = ? AND order_id = ?;";
+        ArrayList<TypeCaster> queryList = new ArrayList<>();
+        queryList.add(new TypeCaster(String.valueOf(productId), true));
+        queryList.add(new TypeCaster(String.valueOf(orderId), true));
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            ResultSet rs = conn.process(query, queryList);
+            int count = rs.getInt("count");
+            int difference = quantity - count;
+            if (difference > 0) {
+                for (int i = 0; i < difference; i++) {
+                    add(productDataStore.find(productId), orderId);
+                }
+            }
+            else if (difference < 0) {
+                for (int i = 0; i < -difference; i++) {
+                    removeProduct(productId, orderId);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
