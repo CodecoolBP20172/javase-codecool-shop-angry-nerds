@@ -75,6 +75,8 @@ public class Main {
             if (ProductController.checkLogin(req, res)) {
                 req.session(true);
                 req.session().attribute("email",req.queryParams("email"));
+                int userId = ProductController.getUserIdByEmail(req.queryParams("email"));
+                req.session().attribute("userId", String.valueOf(userId));
                 res.redirect("/");
             } else {
                 halt(401);
@@ -85,7 +87,7 @@ public class Main {
 
         post("/sign-up", (Request req, Response res) -> {
             //save user data here
-            if (ProductController.saveUser(req, res)){
+            if (ProductController.check(req)){
                 req.session(true);
                 req.session().attribute("email",req.queryParams("email"));
                 int userId = ProductController.getUserIdByEmail(req.queryParams("email"));

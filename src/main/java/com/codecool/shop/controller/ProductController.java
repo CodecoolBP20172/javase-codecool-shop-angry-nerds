@@ -59,6 +59,9 @@ public class ProductController {
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
         params.put("products", productDataStore.getAll());
+        if (req.session().attribute("userId") != null) {
+            System.out.println(req.session().attribute("userId").toString());
+        }
         if (req.session().attribute("userId") == null) {
             params.put("cartSize", 0);
         }
@@ -293,7 +296,7 @@ public class ProductController {
         return new ModelAndView(params, "signUp");
     }
 
-    public static boolean saveUser(Request req, Response res) {
+    public static void saveUser(Request req, Response res) {
         String password = com.codecool.shop.Password.hashPassword(req.queryParams("password"));
         userDataJDBC.saveUserData(req.queryParams("name"), req.queryParams("email"), password);
         LinkedHashMap<String, String> userData = new LinkedHashMap<>();
@@ -302,7 +305,6 @@ public class ProductController {
         User user = new User(userData);
         Order order = new Order(user);
         orderData.add(order);
-        return userDataJDBC.saveUserData(req.queryParams("name"), req.queryParams("email"), password);
     }
 
     public static boolean checkLogin(Request req, Response res) {
@@ -312,6 +314,10 @@ public class ProductController {
 
     public static int getUserIdByEmail(String email) {
         return userDataJDBC.getUserId(email);
+    }
+
+    public static boolean check(Request req) {
+        return userDataJDBC.emailCheck(req.queryParams("email"));
     }
 
 }

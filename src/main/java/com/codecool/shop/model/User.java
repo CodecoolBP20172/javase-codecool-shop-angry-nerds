@@ -31,15 +31,6 @@ public class User{
 
         this.userData = userData;
 
-//        List<String> list = new ArrayList<>(Arrays.asList("name", "email", "Phone Number", "Billing Address",
-//                "Billing City", "Billing Zipcode", "Billing Country","Shipping Address", "Shipping City",
-//                "Shipping Zipcode",  "Shipping Country"));
-//        List<String> data = new ArrayList<>(Arrays.asList(name, email, phone_number, billing_address, billing_city,
-//                billing_zipcode, billing_country,shipping_address, shipping_city, shipping_zipcode,  shipping_country));
-//        userData = new LinkedHashMap();
-//        for (int i=0; i<list.size(); i++){
-//            userData.put(list.get(i), data.get(i));
-//        };
     }
 
     /**

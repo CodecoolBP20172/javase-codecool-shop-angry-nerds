@@ -62,6 +62,10 @@ public class Order {
         return user.getUserData();
     }
 
+    public User getUser() {
+        return user;
+    }
+
     /**
      * Gets the products and ids of products of this cart
      * @return the products and ids of products of this cart

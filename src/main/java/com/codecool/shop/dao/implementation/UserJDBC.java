@@ -90,20 +90,16 @@ public class UserJDBC {
         return user;
     }
 
-    public boolean saveUserData(String name ,String email, String password) {
-        if (emailCheck(email)) {
-            try (ConnectionHandler conn = new ConnectionHandler()) {
-                List<TypeCaster> args = new ArrayList<>();
-                args.add(new TypeCaster(name, false));
-                args.add(new TypeCaster(email, false));
-                args.add(new TypeCaster(password, false));
-                conn.execute("INSERT INTO user_data (id,name,email,password) VALUES(DEFAULT, ?, ?, ?)", args);
-                return true;
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
+    public void saveUserData(String name ,String email, String password) {
+        try (ConnectionHandler conn = new ConnectionHandler()) {
+            List<TypeCaster> args = new ArrayList<>();
+            args.add(new TypeCaster(name, false));
+            args.add(new TypeCaster(email, false));
+            args.add(new TypeCaster(password, false));
+            conn.execute("INSERT INTO user_data (id,name,email,password) VALUES(DEFAULT, ?, ?, ?)", args);
+        } catch (SQLException e) {
+            e.printStackTrace();
         }
-        return false;
 
     }
 

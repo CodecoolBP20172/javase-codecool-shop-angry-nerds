@@ -81,7 +81,7 @@ public class OrderDaoJDBC implements OrderDao{
         String query = "INSERT INTO orders (user_data_id, status) VALUES (?, ?);";
         try(ConnectionHandler handler = new ConnectionHandler()) {
             ArrayList<TypeCaster> queryList = new ArrayList<>();
-            queryList.add(new TypeCaster(String.valueOf(UserJDBC.getCurrentUserId()), true));
+            queryList.add(new TypeCaster(String.valueOf(order.getUser().getId()), true));
             queryList.add(new TypeCaster(String.valueOf(order.getStatus()), false));
             handler.execute(query, queryList);
             logger.debug("Order added successfully to database");

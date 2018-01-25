@@ -95,14 +95,14 @@ ALTER TABLE ONLY supplier
 
 
 
-ALTER TABLE ONLY orders
-    ADD CONSTRAINT fk_user_data_id FOREIGN KEY (user_data_id) REFERENCES user_data(id);
-
-ALTER TABLE ONLY cart
-    ADD CONSTRAINT fk_order_id FOREIGN KEY (order_id) REFERENCES orders(id) ;
-
-ALTER TABLE ONLY cart
-    ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES product(id) ;
+--ALTER TABLE ONLY orders
+--    ADD CONSTRAINT fk_user_data_id FOREIGN KEY (user_data_id) REFERENCES user_data(id);
+--
+--ALTER TABLE ONLY cart
+--    ADD CONSTRAINT fk_order_id FOREIGN KEY (order_id) REFERENCES orders(id) ;
+--
+--ALTER TABLE ONLY cart
+--    ADD CONSTRAINT fk_product_id FOREIGN KEY (product_id) REFERENCES product(id) ;
 
 
 INSERT INTO supplier VALUES(1, 'Amazon', 'Digital content and services');
@@ -120,9 +120,3 @@ INSERT INTO product VALUES (1, 'Amazon Fire', 49.9, 'USD',  'Fantastic price. La
 INSERT INTO product VALUES (2, 'Lenovo IdeaPad Miix 700', 479, 'USD', 'Keyboard cover is included. Fanless Core m5 processor. Full-size USB ports. Adjustable kickstand.', 2, 2);
 INSERT INTO product VALUES (3, 'Amazon Fire HD 8', 89, 'USD', 'Amazons latest Fire HD 8 tablet is a great value for media consumption.', 2, 1);
 SELECT pg_catalog.setval('product_id_seq', 3, true);
-
-INSERT INTO user_data VALUES(1, 'Gipsz Jakab', 'testemail@gmail.com', '303377027', 'Kőbányai utca', 'Budakalász', '2011', 'Hungary', 'Déryné utca', 'Gödöllő', '2100', 'Hungary', '123');
-SELECT pg_catalog.setval('user_data_id_seq', 1, true);
-
-INSERT INTO orders VALUES(1, 1, 'In Cart');
-SELECT pg_catalog.setval('orders_id_seq', 1, true);
