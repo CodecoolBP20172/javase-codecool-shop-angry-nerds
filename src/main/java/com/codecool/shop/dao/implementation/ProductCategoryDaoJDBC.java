@@ -132,7 +132,7 @@ public class ProductCategoryDaoJDBC implements ProductCategoryDao{
             logger.debug("Product category removed from database");
         }
         catch (SQLException e) {
-            logger.warn("Connection to database failed while trying to remove product category from database");
+            logger.warn("Connection to database failed while trying to removeByOrderId product category from database");
         }
     }
 

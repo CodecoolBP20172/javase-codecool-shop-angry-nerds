@@ -55,7 +55,7 @@ public class ProductController {
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
         params.put("products", productDataStore.getAll());
-        params.put("cartSize", cartData.getCount());
+        params.put("cartSize", cartData.getCount(OrderDaoJDBC.getCurrentOrderId()));
         logger.debug("Rendering index page with params:{}",params);
         return new ModelAndView(params, "product/index");
     }
@@ -236,7 +236,7 @@ public class ProductController {
         cartData.clearCart();
         params.put("message", "Payment successful!");
         params.put("userData", userDataJDBC.getUser(userDataJDBC.getCurrentUser()).getUserData());
-        params.put("orderData", orderData.getLast().getProductList());
+        params.put("orderData", orderData.getLast().getCart());
         params.put("orderId", orderData.getLast().getId());
         params.put("sumPrice", sumPrice);
         logger.info("Sending email with order...");
@@ -246,18 +246,18 @@ public class ProductController {
     }
 
     /**
-     * Calls the remove method for the target product from the cart.
-     * @param id product id which to remove.
+     * Calls the removeByOrderId method for the target product from the cart.
+     * @param id product id which to removeByOrderId.
      */
     public static void removeProduct(Integer id) {
         logger.info("Removing product...");
         logger.debug("Removing product with id: {}", id);
-        cartData.remove(id);
+        cartData.removeByOrderId(id);
     }
 
     /**
      * Changes a quantity of the target product in the cart.
-     * If changed to 0, calls remove, otherwise setQuantity.
+     * If changed to 0, calls removeByOrderId, otherwise setQuantity.
      * @param id product id which to set quantity on.
      * @param quantity numeric value of quantity to set on.
      */
@@ -265,7 +265,7 @@ public class ProductController {
         logger.info("Changing quantity of a product..");
         if (quantity == 0) {
             logger.debug("Quantity = {}. Removing product with id: {}",quantity, id);
-            cartData.remove(id);
+            cartData.removeByOrderId(id);
         } else {
             logger.debug("Quantity = {}. Setting quantity of the product with id: {}",quantity, id);
             cartData.setQuantity(id, quantity);

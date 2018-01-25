@@ -1,5 +1,6 @@
 package com.codecool.shop.model;
 
+import com.sun.tools.corba.se.idl.constExpr.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,8 +10,8 @@ import java.util.Map;
 
 
 /**
- * This class serves as model for every productList class and holds all the information about each of them.
- * Id field is an int it help to identify a concrete productList.
+ * This class serves as model for every cart class and holds all the information about each of them.
+ * Id field is an int it help to identify a concrete cart.
  * Order field is a HashMap which contains a content of a cart<Product, Integer>.
  * UserData field is a LinkedHashMap which contains the user data.
  *
@@ -22,9 +23,9 @@ import java.util.Map;
 
 public class Order {
     private int id;
-    private Map<Product, Integer> productList;
+    private Cart cart;
     private User user;
-    private String status;
+    private Status status;
 
     private static final Logger logger = LoggerFactory.getLogger(Order.class);
 
@@ -33,45 +34,58 @@ public class Order {
      * @param user the department of the product category
      */
     public Order(User user) {
-        this.productList = new LinkedHashMap<>();
+        this.cart = new Cart(id);
         this.user = user;
-        logger.trace("Created instance of class Order with productList {} and username {}", productList, user);
+        this.status = Status.IN_CART;
+        logger.trace("Created instance of class Order with username {}", user);
 
     }
 
+    public Order(int id, User user, Cart cart, Status status) {
+        this.id = id;
+        this.user = user;
+        this.cart = cart;
+        this.status = status;
+        logger.trace("Created instance of class Order with cart {} and username {}", cart, user);
+    }
+
+    public Status getStatus() {
+        return status;
+    }
+
     /**
-     * Gets the data of user linked to this productList
-     * @return the data of the user linked to this productList
+     * Gets the data of user linked to this cart
+     * @return the data of the user linked to this cart
      */
     public HashMap getUserData() {
-        logger.trace("User's data of this productList are {}", user.getUserData() );
+        logger.trace("User's data of this cart are {}", user.getUserData() );
         return user.getUserData();
     }
 
     /**
-     * Gets the products and ids of products of this productList
-     * @return the products and ids of products of this productList
+     * Gets the products and ids of products of this cart
+     * @return the products and ids of products of this cart
      */
-    public Map<Product, Integer> getProductList() {
-        logger.trace("Products of this productList are {}", productList);
-        return productList;
+    public Cart getCart() {
+        logger.trace("Products of this cart are {}", cart);
+        return cart;
     }
 
     /**
-     * Gets the id of this productList
-     * @return the id of this productList
+     * Gets the id of this cart
+     * @return the id of this cart
      */
     public int getId() {
-        logger.trace("Id of this productList is {}", id );
+        logger.trace("Id of this cart is {}", id );
         return id;
     }
 
     /**
-     * Sets productList id
-     * @param id what productList id should be set
+     * Sets cart id
+     * @param id what cart id should be set
      */
     public void setId(int id) {
-        logger.trace("Set productList id {} to {}", this.id, id);
+        logger.trace("Set cart id {} to {}", this.id, id);
         this.id = id;
     }
 
@@ -83,7 +97,7 @@ public class Order {
     public String toString() {
         return "Order{" +
                 "id=" + id +
-                ", productList=" + productList +
+                ", cart=" + cart +
                 ", userData=" + user.getUserData() +
                 '}';
     }
@@ -102,7 +116,7 @@ public class Order {
         Order order1 = (Order) o;
 
         if (getId() != order1.getId()) return false;
-        if (getProductList() != null ? !getProductList().equals(order1.getProductList()) : order1.getProductList() != null) return false;
+        if (getCart() != null ? !getCart().equals(order1.getCart()) : order1.getCart() != null) return false;
         return getUserData() != null ? getUserData().equals(order1.getUserData()) : order1.getUserData() == null;
     }
 
@@ -113,7 +127,7 @@ public class Order {
     @Override
     public int hashCode() {
         int result = getId();
-        result = 31 * result + (getProductList() != null ? getProductList().hashCode() : 0);
+        result = 31 * result + (getCart() != null ? getCart().hashCode() : 0);
         result = 31 * result + (getUserData() != null ? getUserData().hashCode() : 0);
         return result;
     }

@@ -61,29 +61,4 @@ public class OrderDaoMem implements OrderDao {
         logger.debug("Order added successfully to the memory");
     }
 
-    /**
-     * This method gets all the Orders from the memory and returns them in a List.
-     * @return a List, which contains all the Orders
-     */
-    @Override
-    public List<Order> getAll() {
-        logger.debug("Returning all Orders stored in memory");
-        return DATA;
-    }
-
-    /**
-     * This method gets the last Order from the memory and returns it.
-     * @return an Order, which is the last in the memory.
-     */
-    @Override
-    public Order getLast() {
-        if (DATA.size() < 1){
-            logger.debug("Returning null instead of last Order because no Order has been stored in memory");
-            return null;
-        }
-        logger.debug("Returning the last Order stored in memory");
-        return DATA.get(DATA.size()-1);
-    }
-
-
 }

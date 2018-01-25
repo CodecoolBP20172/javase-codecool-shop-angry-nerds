@@ -1,23 +1,16 @@
 package com.codecool.shop.dao;
 
+import com.codecool.shop.model.Cart;
 import com.codecool.shop.model.Product;
-import com.codecool.shop.model.Supplier;
 
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 
 public interface CartDao {
 
-    void add(Product product);
-
-    Map<Product, Integer> getAll();
-
-    int getCount();
-
-    void clearCart();
-    void remove(int id);
-    void setQuantity(int id, int quantity);
+    void add(Product product, int orderId);
+    Cart find(int orderId);
+    int getCount(int orderId);
+    void removeByOrderId(int orderId);
 
 }
 

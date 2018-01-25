@@ -1,6 +1,7 @@
 package com.codecool.shop.dao.implementation;
 
 
+import com.codecool.shop.dao.CartDao;
 import com.codecool.shop.dao.ProductCategoryDao;
 import com.codecool.shop.dao.SupplierDao;
 import com.codecool.shop.database.TypeCaster;
@@ -32,6 +33,8 @@ import java.util.List;
 public class OrderDaoJDBC implements OrderDao{
 
     private static OrderDaoJDBC instance = null;
+    private static CartDao cartData = CartDaoJDBC.getInstance();
+    private static UserJDBC userDataJDBC = UserJDBC.getInstance();
     private static ProductCategoryDao productCategoryDataStore = ProductCategoryDaoJDBC.getInstance();
     private static SupplierDao supplierDataStore = SupplierDaoJDBC.getInstance();
     private static final Logger logger = LoggerFactory.getLogger(OrderDaoJDBC.class);
@@ -75,10 +78,11 @@ public class OrderDaoJDBC implements OrderDao{
             logger.debug("OrderDaoJDBC add method received invalid argument");
             throw new IllegalArgumentException();
         }
-        String query = "INSERT INTO orders (user_data_id, status) VALUES (?, 'In cart');";
+        String query = "INSERT INTO orders (user_data_id, status) VALUES (?, ?);";
         try(ConnectionHandler handler = new ConnectionHandler()) {
             ArrayList<TypeCaster> queryList = new ArrayList<>();
             queryList.add(new TypeCaster(String.valueOf(UserJDBC.getCurrentUserId()), true));
+            queryList.add(new TypeCaster(String.valueOf(order.getStatus()), false));
             handler.execute(query, queryList);
             logger.debug("Order added successfully to database");
         } catch (SQLException e){
@@ -87,87 +91,38 @@ public class OrderDaoJDBC implements OrderDao{
         }
     }
 
-    /**
-     * This method gets all the orders from the database and returns them in a list.
-     * <p>
-     * It uses the ConnectionHandler class to establish connection to the database. If it fails, it
-     * logs a warning about connection failure. However, if the connection went through without problems,
-     * it then returns all the orders in a List.
-     * @return a List, which contains all the orders
-     */
-    @Override
-    public List<Order> getAll() {
-        List<Order> orders = new ArrayList <>();
-        String query = "SELECT * FROM orders;";
-        try (ConnectionHandler handler = new ConnectionHandler()) {
-            ResultSet rs = handler.process(query);
+    public List<Order> findByUserId(int userId) {
+        String query = "SELECT * FROM orders WHERE user_data_id = ?;";
+        List<Order> listOfOrders = new ArrayList<>();
+        try(ConnectionHandler conn = new ConnectionHandler()) {
+            ArrayList<TypeCaster> list = new ArrayList<>();
+            list.add(new TypeCaster(String.valueOf(userId), true));
+            ResultSet rs = conn.process(query, list);
             while (rs.next()) {
-                int id = rs.getInt("id");
-                int userDataId = rs.getInt("user_data_id");
+                Integer orderId = rs.getInt("id");
                 String status = rs.getString("status");
-                orders.add(new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId))); //CartDao needs a get
+                Order order = new Order(orderId, userDataJDBC.getUser(userId),cartData.find(orderId),Status.valueOf(status));
+                listOfOrders.add(order);
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            logger.warn("Connection to database failed while trying get all order from database");
         }
-        logger.debug("Returning all orders in a list");
-        return orders;
+        catch (SQLException e) {
+            logger.warn("Connection to database failed while trying to find product in database");
+        }
+        if (listOfOrders.get(0) != null) {
+            logger.debug("Orders found in memory and returned");
+            return listOfOrders;
+        }
+        else {
+            logger.warn("No order found in database for this id");
+            return null;
+        }
     }
 
-    /**
-     * This method gets the last order from the database and returns it.
-     * <p>
-     * It uses the ConnectionHandler class to establish connection to the database. If it fails, it
-     * logs a warning about connection failure. However, if the connection went through without problems,
-     * then it returns the last order.
-     * @return an Order, which is the last order in the database.
-     */
-    @Override
-    public Order getLast() {
-        Order lastOrder = null;
-        String query = "SELECT * FROM orders ORDER BY id DESC limit 1;";
-        try(ConnectionHandler handler = new ConnectionHandler()) {
-            ResultSet rs = handler.process(query);
-            rs.next();
-            int id = rs.getInt("id");
-            int userDataId = rs.getInt("user_data_id");
-            int cartId = rs.getInt("cart_id");
-            lastOrder = new Order(CartDaoJDBC.getInstance().getAll(), UserJDBC.getUser(userDataId));
-            lastOrder.setId(id);
-        } catch (SQLException e){
-            e.printStackTrace();
-            logger.warn("Connection to database failed while trying get the last order from database");
+    public Order findByUserIdAndStatus(int userId, Status status) {
+        List<Order> listOfOrders = findByUserId(userId);
+        for (Order order : listOfOrders) {
+            if (order.getStatus().equals(status)) return order;
         }
-        logger.debug("Returning the last order in a list");
-        return lastOrder;
-    }
-
-    public List getProductList(int orderId) {
-        List<Product> productList = new ArrayList <>();
-        String query = "SELECT product.id, product.name, product.default_price, product.default_currency, "
-                     + "product.description, product.product_category_id, product.supplier_id "
-                     + "FROM cart "
-                     + "LEFT JOIN product ON cart.product_id = product.id "
-                     + "WHERE cart.order_id = ?;";
-        try (ConnectionHandler handler = new ConnectionHandler()) {
-            ArrayList<TypeCaster> queryList = new ArrayList<>();
-            queryList.add(new TypeCaster(String.valueOf(orderId), true));
-            ResultSet rs = handler.process(query, queryList);
-            while (rs.next()) {
-                String name = rs.getString("product.name");
-                float defaultPrice = rs.getFloat("product.default_price");
-                String defaultCurrency = rs.getString("product.default_currency");
-                String description = rs.getString("product.description");
-                ProductCategory productCategory = productCategoryDataStore.find(rs.getInt("product.product_category_id"));
-                Supplier supplier = supplierDataStore.find(rs.getInt("product.supplier_id"));
-                productList.add(new Product(name, defaultPrice, defaultCurrency, description, productCategory, supplier));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-            logger.warn("Connection to database failed while trying get all order from database");
-        }
-        logger.debug("Returning all orders in a list");
-        return productList;
+        return null;
     }
 }
