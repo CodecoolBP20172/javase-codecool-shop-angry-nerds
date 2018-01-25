@@ -52,7 +52,7 @@ public class OrderDaoMem implements OrderDao {
      * @throws IllegalArgumentException if the parameter category equals to null
      */
     @Override
-    public void add(Order order) {
+    public void add(Order order, int userId) {
         if (order == null) {
             logger.debug("OrderDaoMem add method received invalid argument");
             throw new IllegalArgumentException();
@@ -60,6 +60,11 @@ public class OrderDaoMem implements OrderDao {
         order.setId(DATA.size() + 1);
         DATA.add(order);
         logger.debug("Order added successfully to the memory");
+    }
+
+    @Override
+    public void changeStatus(int orderId, Status status) {
+
     }
 
     @Override

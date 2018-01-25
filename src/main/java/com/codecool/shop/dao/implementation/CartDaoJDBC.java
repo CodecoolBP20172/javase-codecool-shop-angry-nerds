@@ -62,7 +62,7 @@ public class CartDaoJDBC implements CartDao {
             List<TypeCaster> list = new ArrayList<>();
             list.add(new TypeCaster(String.valueOf(product.getId()), true));
             list.add(new TypeCaster(String.valueOf(orderId), true));
-            con.process("INSERT INTO cart VALUES (DEFAULT, ?, ?);", list);
+            con.execute("INSERT INTO cart VALUES (DEFAULT, ?, ?);", list);
             logger.debug("Product added to database");
         } catch (SQLException e) {
             logger.warn("Connection to database failed while adding product to database");
@@ -72,7 +72,7 @@ public class CartDaoJDBC implements CartDao {
 
     @Override
     public Cart find(int orderId) {
-        String query = "SELECT product_id FROM cart WHERE id = ?;";
+        String query = "SELECT product_id FROM cart WHERE order_id = ?;";
         Cart cart = new Cart(orderId);
 
         try(ConnectionHandler conn = new ConnectionHandler()) {
@@ -134,7 +134,7 @@ public class CartDaoJDBC implements CartDao {
         queryList.add(new TypeCaster(String.valueOf(productId), true));
         queryList.add(new TypeCaster(String.valueOf(orderId), true));
         try (ConnectionHandler conn = new ConnectionHandler()) {
-            conn.execute("DELETE FROM cart WHERE id = any (array(SELECT * FROM cart WHERE product_id = ? AND order_id = ? LIMIT 1));", queryList);
+            conn.execute("DELETE FROM cart WHERE id = any (array(SELECT id FROM cart WHERE product_id = ? AND order_id = ? LIMIT 1));", queryList);
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -150,6 +150,7 @@ public class CartDaoJDBC implements CartDao {
         queryList.add(new TypeCaster(String.valueOf(orderId), true));
         try (ConnectionHandler conn = new ConnectionHandler()) {
             ResultSet rs = conn.process(query, queryList);
+            rs.next();
             int count = rs.getInt("count");
             int difference = quantity - count;
             if (difference > 0) {

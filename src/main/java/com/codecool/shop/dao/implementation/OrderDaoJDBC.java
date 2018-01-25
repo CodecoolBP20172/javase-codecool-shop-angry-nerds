@@ -73,7 +73,7 @@ public class OrderDaoJDBC implements OrderDao{
      * @throws IllegalArgumentException if the parameter order equals to null
      */
     @Override
-    public void add(Order order) {
+    public void add(Order order, int userId) {
         if (order == null) {
             logger.debug("OrderDaoJDBC add method received invalid argument");
             throw new IllegalArgumentException();
@@ -81,13 +81,28 @@ public class OrderDaoJDBC implements OrderDao{
         String query = "INSERT INTO orders (user_data_id, status) VALUES (?, ?);";
         try(ConnectionHandler handler = new ConnectionHandler()) {
             ArrayList<TypeCaster> queryList = new ArrayList<>();
-            queryList.add(new TypeCaster(String.valueOf(order.getUser().getId()), true));
+            queryList.add(new TypeCaster(String.valueOf(userId), true));
             queryList.add(new TypeCaster(String.valueOf(order.getStatus()), false));
             handler.execute(query, queryList);
             logger.debug("Order added successfully to database");
         } catch (SQLException e){
             e.printStackTrace();
             logger.warn("Connection to database failed while adding order to database");
+        }
+    }
+
+    @Override
+    public void changeStatus(int orderId, Status status) {
+        String query = "UPDATE orders SET status = ? WHERE id = ?;";
+        try(ConnectionHandler handler = new ConnectionHandler()) {
+            ArrayList<TypeCaster> queryList = new ArrayList<>();
+            queryList.add(new TypeCaster(String.valueOf(status), false));
+            queryList.add(new TypeCaster(String.valueOf(orderId), true));
+            handler.execute(query, queryList);
+            logger.debug("Order status changed");
+        } catch (SQLException e){
+            e.printStackTrace();
+            logger.warn("Connection to database failed while updating order to database");
         }
     }
 

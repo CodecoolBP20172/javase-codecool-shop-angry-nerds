@@ -76,7 +76,7 @@ public class UserJDBC {
                 userData.put("Shipping City", rs.getString("shipping_city"));
                 userData.put("Shipping Zipcode", rs.getString("shipping_zipcode"));
                 userData.put("Shipping Country", rs.getString("shipping_country"));
-                user = new User(userData);
+                user = new User(id, userData);
             }
         } catch (SQLException e) {
             logger.warn("Connection to database failed while trying to find user in database");

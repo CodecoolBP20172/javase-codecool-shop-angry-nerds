@@ -33,6 +33,12 @@ public class User{
 
     }
 
+    public User(int id, LinkedHashMap<String, String> userData){
+        this.id = id;
+        this.userData = userData;
+
+    }
+
     /**
      * Gets the data of user
      * @return the data of the user

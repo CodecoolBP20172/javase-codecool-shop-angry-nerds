@@ -66,7 +66,7 @@ public class ProductController {
             params.put("cartSize", 0);
         }
         else {
-            params.put("cartSize", cartData.getCount(getUserIdFromSession(req)));
+            params.put("cartSize", cartData.getCount(getOrderIdFromSession(req)));
         }
         logger.debug("Rendering index page with params:{}",params);
         return new ModelAndView(params, "product/index");
@@ -147,6 +147,7 @@ public class ProductController {
     public static ModelAndView addProduct(Request req, String id) {
         logger.info("Adding product to cart...");
         Map params = new HashMap<>();
+        params.put("session",req.session().attribute("email"));
         params.put("title", "All products");
         params.put("products", productDataStore.getAll());
         params.put("categories", productCategoryDataStore.getAll());
@@ -154,7 +155,7 @@ public class ProductController {
         Product product = productDataStore.find(Integer.parseInt(id));
         logger.debug("Find product by id {} = {}", id, product);
         cartData.add(product, getOrderIdFromSession(req));
-        params.put("cartSize", cartData.getCount(getUserIdFromSession(req)));
+        params.put("cartSize", cartData.getCount(getOrderIdFromSession(req)));
         logger.debug("Rendering index page with params: {}", params);
         return new ModelAndView(params, "product/index");
     }
@@ -222,7 +223,7 @@ public class ProductController {
         userDataJDBC.updateUser(user);
         Order order = new Order(getOrderIdFromSession(req), userDataJDBC.getUser(getUserIdFromSession(req)), cartData.find(getOrderIdFromSession(req)), Status.CHECKED_OUT);
         logger.debug("New order: {}", order);
-        orderData.add(order);
+        orderData.add(order, getUserIdFromSession(req));
         json.put("Ordered Items", cartData.find(getOrderIdFromSession(req)));
         json.put("Order ID", getOrderIdFromSession(req));
         logger.info("Writing order to file...");
@@ -253,12 +254,14 @@ public class ProductController {
         params.put("session" ,req.session().attribute("email"));
         params.put("message", "Payment successful!");
         params.put("userData", userDataJDBC.getUser(getUserIdFromSession(req)).getUserData());
-        params.put("orderData", orderData.findByUserIdAndStatus(getUserIdFromSession(req),Status.CHECKED_OUT).getCart());
+        params.put("orderData", cartData.find(getOrderIdFromSession(req)).getCart());
         params.put("orderId", getOrderIdFromSession(req));
         params.put("sumPrice", sumPrice);
         logger.info("Sending email with order...");
-        Email.sendEmail(orderData.findByUserIdAndStatus(getUserIdFromSession(req),Status.CHECKED_OUT), userDataJDBC.getUser(getUserIdFromSession(req)));
+        Email.sendEmail(cartData.find(getOrderIdFromSession(req)), userDataJDBC.getUser(getUserIdFromSession(req)), getOrderIdFromSession(req));
+        orderData.changeStatus(getOrderIdFromSession(req), Status.PAID);
         Order order = new Order(userDataJDBC.getUser(getUserIdFromSession(req)));
+        orderData.add(order, getUserIdFromSession(req));
         return new ModelAndView(params, "confirmation");
     }
 
@@ -266,10 +269,10 @@ public class ProductController {
      * Calls the removeByOrderId method for the target product from the cart.
      * @param id product id which to removeByOrderId.
      */
-    public static void removeProduct(Integer id) {
+    public static void removeProduct(Request req, Integer id) {
         logger.info("Removing product...");
         logger.debug("Removing product with id: {}", id);
-        cartData.removeByOrderId(id);
+        cartData.removeProduct(id, getOrderIdFromSession(req));
     }
 
     /**
@@ -305,12 +308,8 @@ public class ProductController {
     public static void saveUser(Request req, Response res) {
         String password = com.codecool.shop.Password.hashPassword(req.queryParams("password"));
         userDataJDBC.saveUserData(req.queryParams("name"), req.queryParams("email"), password);
-        LinkedHashMap<String, String> userData = new LinkedHashMap<>();
-        userData.put("Name", req.queryParams("name"));
-        userData.put("E-mail", req.queryParams("email"));
-        User user = new User(userData);
-        Order order = new Order(user);
-        orderData.add(order);
+        Order order = new Order(userDataJDBC.getUser(getUserIdByEmail(req.queryParams("email"))));
+        orderData.add(order, getUserIdByEmail(req.queryParams("email")));
     }
 
     public static boolean checkLogin(Request req, Response res) {

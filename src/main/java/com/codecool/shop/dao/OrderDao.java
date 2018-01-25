@@ -6,7 +6,9 @@ import java.util.List;
 
 public interface OrderDao {
 
-    void add(Order order);
+    public void add(Order order, int userId);
+
+    public void changeStatus(int orderId, Status status);
 
     public List<Order> findByUserId(int userId);
 

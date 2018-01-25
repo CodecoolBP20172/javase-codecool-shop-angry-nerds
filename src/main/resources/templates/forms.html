@@ -19,8 +19,6 @@
     <div class="well well-sm" th:switch="${title}">
         <div th:case="'Checkout'">
         <form method="POST" action="/protected/payment">
-            <h3>Name:  </h3><input type="text" name="Name" value=""/><br/>
-            <h3>Email: </h3><input type="text" name="E-mail" value=""/><br/>
             <h3>Phone Number: </h3><input type="number" name="Phone Number" value=""/><br/>
             <h3>Billing Address: </h3>
                 <h4>Address: </h4><input type="text" name="Billing Address" value=""/><br/>

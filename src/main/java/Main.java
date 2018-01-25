@@ -47,7 +47,7 @@ public class Main {
             return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
         get("/protected/remove/:id", (Request req, Response res) -> {
-            ProductController.removeProduct(Integer.parseInt(req.params(":id")));
+            ProductController.removeProduct(req, Integer.parseInt(req.params(":id")));
             return new ThymeleafTemplateEngine().render( ProductController.renderCart(req));
         });
         get("/protected/changeQuantity/:id", (Request req, Response res) -> {
@@ -98,9 +98,8 @@ public class Main {
             if (ProductController.check(req)){
                 req.session(true);
                 req.session().attribute("email",req.queryParams("email"));
-                int userId = ProductController.getUserIdByEmail(req.queryParams("email"));
-                req.session().attribute("userId", String.valueOf(userId));
-                res.redirect("/");
+                ProductController.saveUser(req, res);
+                res.redirect("/login");
             } else {
                 res.redirect("/sign-up");
             }
