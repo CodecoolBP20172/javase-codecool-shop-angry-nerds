@@ -23,11 +23,11 @@ public class Main {
         port(8000);
 
         // populate some data for the memory storage
-        populateData();
+        //populateData();
 
         before("/protected/*", (request, response) -> {
             if (request.session().attribute("email") == null) {
-                halt(501, "Login for this page");
+                halt(401, "Login for this page");
             }
             });
 
@@ -87,8 +87,8 @@ public class Main {
                 req.session().attribute("userId", String.valueOf(userId));
                 res.redirect("/");
             } else {
-                halt(401, "Invalid login");
-                res.redirect("/");
+                return new ThymeleafTemplateEngine().render(ProductController.login(req, res, "wrong email/pw"));
+
             }
             return null;
         });
@@ -101,7 +101,7 @@ public class Main {
                 ProductController.saveUser(req, res);
                 res.redirect("/login");
             } else {
-                res.redirect("/sign-up");
+                return new ThymeleafTemplateEngine().render(ProductController.signUp(req, res, "email is already in use"));
             }
             return null;
         });

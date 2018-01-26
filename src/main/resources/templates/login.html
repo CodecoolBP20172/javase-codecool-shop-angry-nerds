@@ -15,6 +15,7 @@
         <strong th:text="${title}"></strong>
     </div>
         <div>
+            <p th:if="${error} != null" th:text="${error}" style="color: darkred"></p>
         <form method="POST" action="/login">
             <h3>E-mail: </h3><input type="text" name="email" value=""/><br/>
             <h3>Password: </h3><input type="password" name="password" value=""/><br/><br/>

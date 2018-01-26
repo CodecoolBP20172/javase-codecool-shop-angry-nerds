@@ -87,7 +87,12 @@ public class ProductController {
         params.put("session" ,req.session().attribute("email"));
         params.put("categories", productCategoryDataStore.getAll());
         params.put("suppliers", supplierDataStore.getAll());
-        params.put("cartSize", cartData.getCount(getUserIdFromSession(req)));
+        if (req.session().attribute("userId") == null) {
+            params.put("cartSize", 0);
+        }
+        else {
+            params.put("cartSize", cartData.getCount(getOrderIdFromSession(req)));
+        }
         if (supOrCat.equals("supplier")){
             Supplier supplier = supplierDataStore.find(Integer.parseInt(id));
             logger.debug("Find supplier by id {} = {}", id, supplier);
@@ -292,15 +297,28 @@ public class ProductController {
         }
 
     }
-
     public static ModelAndView login(Request req, Response res){
         Map params = new HashMap();
         params.put("title", "Login");
         return new ModelAndView(params, "login");
     }
 
+    public static ModelAndView login(Request req, Response res, String error){
+        Map params = new HashMap();
+        params.put("error", error);
+        params.put("title", "Login");
+        return new ModelAndView(params, "login");
+    }
+
     public static ModelAndView signUp(Request req, Response res){
         Map params = new HashMap();
+        params.put("title", "Sign Up");
+        return new ModelAndView(params, "signUp");
+    }
+
+    public static ModelAndView signUp(Request req, Response res, String error){
+        Map params = new HashMap();
+        params.put("error", error);
         params.put("title", "Sign Up");
         return new ModelAndView(params, "signUp");
     }

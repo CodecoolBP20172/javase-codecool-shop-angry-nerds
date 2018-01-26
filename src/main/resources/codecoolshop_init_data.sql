@@ -119,4 +119,13 @@ SELECT pg_catalog.setval('product_category_id_seq', 4, true);
 INSERT INTO product VALUES (1, 'Amazon Fire', 49.9, 'USD',  'Fantastic price. Large content ecosystem. Good parental controls. Helpful technical support.', 2, 1);
 INSERT INTO product VALUES (2, 'Lenovo IdeaPad Miix 700', 479, 'USD', 'Keyboard cover is included. Fanless Core m5 processor. Full-size USB ports. Adjustable kickstand.', 2, 2);
 INSERT INTO product VALUES (3, 'Amazon Fire HD 8', 89, 'USD', 'Amazons latest Fire HD 8 tablet is a great value for media consumption.', 2, 1);
+INSERT INTO product VALUES (4, 'Apple audio', 89999, 'USD', 'shiny', 3, 3);
+INSERT INTO product VALUES (5, 'Apple electronics', 9999, 'USD', '?', 4, 3);
+INSERT INTO product VALUES (6, 'Apple notebook', 9999, 'USD', '?', 1, 3);
+INSERT INTO product VALUES (7, 'Apple audio', 9999, 'USD', '?', 3, 3);
+INSERT INTO product VALUES (8, 'Apple electronics', 9999, 'USD', '?', 4, 3);
+
+
+
+
 SELECT pg_catalog.setval('product_id_seq', 3, true);
